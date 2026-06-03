@@ -2,7 +2,9 @@ import { describe, expect, test } from "bun:test"
 import { SessionLegacy } from "@opencode-ai/core/session/legacy"
 import { Effect, Layer } from "effect"
 import { Session } from "@/session/session"
+import { AppFileSystem } from "@opencode-ai/core/filesystem"
 import { SessionPrompt } from "../../src/session/prompt"
+import { Memory } from "../../src/session/memory"
 import * as Log from "@opencode-ai/core/util/log"
 import { MessageV2 } from "../../src/session/message-v2"
 import { testEffect } from "../lib/effect"
@@ -11,7 +13,7 @@ void Log.init({ print: false })
 
 // Skip tests if no API key is available
 const hasApiKey = !!process.env.ANTHROPIC_API_KEY
-const it = testEffect(Layer.mergeAll(SessionPrompt.defaultLayer, Session.defaultLayer))
+const it = testEffect(Layer.mergeAll(SessionPrompt.defaultLayer, Memory.defaultLayer, AppFileSystem.defaultLayer, Session.defaultLayer))
 const live = hasApiKey ? it.instance : it.instance.skip
 
 describe("StructuredOutput Integration", () => {

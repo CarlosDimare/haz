@@ -441,7 +441,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
     if (!text || text.length === 0) return
 
     await Clipboard.copy(text)
-      .then(() => toast.show({ message: "Copied to clipboard", variant: "info" }))
+      .then(() => toast.show({ message: "Copiado al portapapeles", variant: "info" }))
       .catch(toast.error)
 
     renderer.clearSelection()
@@ -456,24 +456,24 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
     if (!terminalTitleEnabled() || Flag.OPENCODE_DISABLE_TERMINAL_TITLE) return
 
     if (route.data.type === "home") {
-      renderer.setTerminalTitle("OpenCode")
+      renderer.setTerminalTitle("ojito")
       return
     }
 
     if (route.data.type === "session") {
       const session = sync.session.get(route.data.sessionID)
       if (!session || SessionApi.isDefaultTitle(session.title)) {
-        renderer.setTerminalTitle("OpenCode")
+        renderer.setTerminalTitle("ojito")
         return
       }
 
       const title = session.title.length > 40 ? session.title.slice(0, 37) + "..." : session.title
-      renderer.setTerminalTitle(`OC | ${title}`)
+      renderer.setTerminalTitle(`ojito | ${title}`)
       return
     }
 
     if (route.data.type === "plugin") {
-      renderer.setTerminalTitle(`OC | ${route.data.id}`)
+      renderer.setTerminalTitle(`ojito | ${route.data.id}`)
     }
   })
 
@@ -486,7 +486,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
         if (!providerID || !modelID)
           return toast.show({
             variant: "warning",
-            message: `Invalid model format: ${args.model}`,
+            message: `Formato de modelo inválido: ${args.model}`,
             duration: 3000,
           })
         local.model.set({ providerID, modelID }, { recent: true })
@@ -514,7 +514,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
           if (result.data?.id) {
             route.navigate({ type: "session", sessionID: result.data.id })
           } else {
-            toast.show({ message: "Failed to fork session", variant: "error" })
+            toast.show({ message: "Error al bifurcar sesión", variant: "error" })
           }
         })
       } else {
@@ -534,7 +534,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       if (result.data?.id) {
         route.navigate({ type: "session", sessionID: result.data.id })
       } else {
-        toast.show({ message: "Failed to fork session", variant: "error" })
+        toast.show({ message: "Error al bifurcar sesión", variant: "error" })
       }
     })
   })
@@ -562,8 +562,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
     [
       {
         name: COMMAND_PALETTE_COMMAND,
-        title: "Show command palette",
-        category: "System",
+        title: "Mostrar paleta de comandos",
+        category: "Sistema",
         hidden: true,
         run: () => {
           dialog.replace(() => <CommandPaletteDialog />)
@@ -571,8 +571,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "session.list",
-        title: "Switch session",
-        category: "Session",
+        title: "Cambiar sesión",
+        category: "Sesión",
         suggested: sync.data.session.length > 0,
         slashName: "sessions",
         slashAliases: ["resume", "continue"],
@@ -582,9 +582,9 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "session.new",
-        title: "New session",
+        title: "Nueva sesión",
         suggested: route.data.type === "session",
-        category: "Session",
+        category: "Sesión",
         slashName: "new",
         slashAliases: ["clear"],
         run: () => {
@@ -596,21 +596,21 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "workspace.copy_path",
-        title: "Copy worktree path",
+        title: "Copiar ruta del worktree",
         category: "Workspace",
         enabled: () => currentWorktreeWorkspace() !== undefined,
         run: async () => {
           const workspace = currentWorktreeWorkspace()
           if (!workspace?.directory) return
           await Clipboard.copy(workspace.directory)
-            .then(() => toast.show({ message: "Copied worktree path", variant: "info" }))
+            .then(() => toast.show({ message: "Ruta de worktree copiada", variant: "info" }))
             .catch(toast.error)
           dialog.clear()
         },
       },
       {
         name: "workspace.list",
-        title: "Manage workspaces",
+        title: "Gestionar workspaces",
         category: "Workspace",
         hidden: !Flag.OPENCODE_EXPERIMENTAL_WORKSPACES,
         slashName: "workspaces",
@@ -620,8 +620,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       ...Array.from({ length: 9 }, (_, i) => ({
         name: `session.quick_switch.${i + 1}`,
-        title: `Switch to session in quick slot ${i + 1}`,
-        category: "Session",
+        title: `Cambiar a sesión en slot rápido ${i + 1}`,
+        category: "Sesión",
         hidden: true,
         run: () => {
           local.session.quickSwitch(i + 1)
@@ -629,9 +629,9 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       })),
       {
         name: "model.list",
-        title: "Switch model",
+        title: "Cambiar modelo",
         suggested: true,
-        category: "Agent",
+        category: "Agente",
         slashName: "models",
         run: () => {
           dialog.replace(() => <DialogModel />)
@@ -639,8 +639,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "model.cycle_recent",
-        title: "Model cycle",
-        category: "Agent",
+        title: "Alternar modelo",
+        category: "Agente",
         hidden: true,
         run: () => {
           local.model.cycle(1)
@@ -648,8 +648,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "model.cycle_recent_reverse",
-        title: "Model cycle reverse",
-        category: "Agent",
+        title: "Alternar modelo inverso",
+        category: "Agente",
         hidden: true,
         run: () => {
           local.model.cycle(-1)
@@ -657,8 +657,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "model.cycle_favorite",
-        title: "Favorite cycle",
-        category: "Agent",
+        title: "Alternar favorito",
+        category: "Agente",
         hidden: true,
         run: () => {
           local.model.cycleFavorite(1)
@@ -666,8 +666,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "model.cycle_favorite_reverse",
-        title: "Favorite cycle reverse",
-        category: "Agent",
+        title: "Alternar favorito inverso",
+        category: "Agente",
         hidden: true,
         run: () => {
           local.model.cycleFavorite(-1)
@@ -675,8 +675,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "agent.list",
-        title: "Switch agent",
-        category: "Agent",
+        title: "Cambiar agente",
+        category: "Agente",
         slashName: "agents",
         run: () => {
           dialog.replace(() => <DialogAgent />)
@@ -684,8 +684,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "mcp.list",
-        title: "Toggle MCPs",
-        category: "Agent",
+        title: "Alternar MCPs",
+        category: "Agente",
         slashName: "mcps",
         run: () => {
           dialog.replace(() => <DialogMcp />)
@@ -693,8 +693,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "agent.cycle",
-        title: "Agent cycle",
-        category: "Agent",
+        title: "Alternar agente",
+        category: "Agente",
         hidden: true,
         run: () => {
           local.agent.move(1)
@@ -702,16 +702,16 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "variant.cycle",
-        title: "Variant cycle",
-        category: "Agent",
+        title: "Alternar variante",
+        category: "Agente",
         run: () => {
           local.model.variant.cycle()
         },
       },
       {
         name: "variant.list",
-        title: "Switch model variant",
-        category: "Agent",
+        title: "Cambiar variante de modelo",
+        category: "Agente",
         hidden: local.model.variant.list().length === 0,
         slashName: "variants",
         run: () => {
@@ -720,8 +720,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "agent.cycle.reverse",
-        title: "Agent cycle reverse",
-        category: "Agent",
+        title: "Alternar agente inverso",
+        category: "Agente",
         hidden: true,
         run: () => {
           local.agent.move(-1)
@@ -729,96 +729,95 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "provider.connect",
-        title: "Connect provider",
+        title: "Conectar proveedor",
         suggested: !connected(),
         slashName: "connect",
         run: () => {
           dialog.replace(() => <DialogProviderList />)
         },
-        category: "Provider",
+        category: "Proveedor",
       },
       ...(sync.data.console_state.switchableOrgCount > 1
         ? [
             {
               name: "console.org.switch",
-              title: "Switch org",
+              title: "Cambiar organización",
               suggested: Boolean(sync.data.console_state.activeOrgName),
               slashName: "org",
               slashAliases: ["orgs", "switch-org"],
               run: () => {
                 dialog.replace(() => <DialogConsoleOrg />)
               },
-              category: "Provider",
+              category: "Proveedor",
             },
           ]
         : []),
       {
         name: "opencode.status",
-        title: "View status",
+        title: "Ver estado",
         slashName: "status",
         run: () => {
           dialog.replace(() => <DialogStatus />)
         },
-        category: "System",
+        category: "Sistema",
       },
       {
         name: "theme.switch",
-        title: "Switch theme",
+        title: "Cambiar tema",
         slashName: "themes",
         run: () => {
           dialog.replace(() => <DialogThemeList />)
         },
-        category: "System",
+        category: "Sistema",
       },
       {
         name: "theme.switch_mode",
-        title: mode() === "dark" ? "Switch to light mode" : "Switch to dark mode",
+        title: mode() === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro",
         run: () => {
           setMode(mode() === "dark" ? "light" : "dark")
           dialog.clear()
         },
-        category: "System",
+        category: "Sistema",
       },
       {
         name: "theme.mode.lock",
-        title: locked() ? "Unlock theme mode" : "Lock theme mode",
+        title: locked() ? "Desbloquear modo de tema" : "Bloquear modo de tema",
         run: () => {
           if (locked()) unlock()
           else lock()
           dialog.clear()
         },
-        category: "System",
+        category: "Sistema",
       },
       {
         name: "help.show",
-        title: "Help",
+        title: "Ayuda",
         slashName: "help",
         run: () => {
           dialog.replace(() => <DialogHelp />)
         },
-        category: "System",
+        category: "Sistema",
       },
       {
         name: "docs.open",
-        title: "Open docs",
+        title: "Abrir documentación",
         run: () => {
-          open("https://opencode.ai/docs").catch(() => {})
           dialog.clear()
         },
-        category: "System",
+        category: "Sistema",
       },
       {
         name: "app.exit",
-        title: "Exit the app",
+        title: "Salir de la app",
         slashName: "exit",
         slashAliases: ["quit", "q"],
         run: () => exit(),
-        category: "System",
+        category: "Sistema",
       },
       {
         name: "app.debug",
-        title: "Toggle debug panel",
-        category: "System",
+        title: "Alternar panel de debug",
+        category: "Sistema",
         run: () => {
           renderer.toggleDebugOverlay()
           dialog.clear()
@@ -826,8 +825,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "app.console",
-        title: "Toggle console",
-        category: "System",
+        title: "Alternar consola",
+        category: "Sistema",
         run: () => {
           renderer.console.toggle()
           dialog.clear()
@@ -835,13 +834,13 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "app.heap_snapshot",
-        title: "Write heap snapshot",
-        category: "System",
+        title: "Escribir heap snapshot",
+        category: "Sistema",
         run: async () => {
           const files = await props.onSnapshot?.()
           toast.show({
             variant: "info",
-            message: `Heap snapshot written to ${files?.join(", ")}`,
+            message: `Snapshot de heap escrito en ${files?.join(", ")}`,
             duration: 5000,
           })
           dialog.clear()
@@ -849,8 +848,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "terminal.suspend",
-        title: "Suspend terminal",
-        category: "System",
+        title: "Suspender terminal",
+        category: "Sistema",
         hidden: true,
         enabled: process.platform !== "win32",
         run: () => {
@@ -864,8 +863,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "terminal.title.toggle",
-        title: terminalTitleEnabled() ? "Disable terminal title" : "Enable terminal title",
-        category: "System",
+        title: terminalTitleEnabled() ? "Deshabilitar título de terminal" : "Habilitar título de terminal",
+        category: "Sistema",
         run: () => {
           setTerminalTitleEnabled((prev) => {
             const next = !prev
@@ -878,8 +877,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "app.toggle.animations",
-        title: kv.get("animations_enabled", true) ? "Disable animations" : "Enable animations",
-        category: "System",
+        title: kv.get("animations_enabled", true) ? "Deshabilitar animaciones" : "Habilitar animaciones",
+        category: "Sistema",
         run: () => {
           kv.set("animations_enabled", !kv.get("animations_enabled", true))
           dialog.clear()
@@ -887,8 +886,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "app.toggle.file_context",
-        title: kv.get("file_context_enabled", true) ? "Disable file context" : "Enable file context",
-        category: "System",
+        title: kv.get("file_context_enabled", true) ? "Deshabilitar contexto de archivos" : "Habilitar contexto de archivos",
+        category: "Sistema",
         run: () => {
           kv.set("file_context_enabled", !kv.get("file_context_enabled", true))
           dialog.clear()
@@ -896,8 +895,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "app.toggle.diffwrap",
-        title: kv.get("diff_wrap_mode", "word") === "word" ? "Disable diff wrapping" : "Enable diff wrapping",
-        category: "System",
+        title: kv.get("diff_wrap_mode", "word") === "word" ? "Deshabilitar ajuste de diff" : "Habilitar ajuste de diff",
+        category: "Sistema",
         run: () => {
           const current = kv.get("diff_wrap_mode", "word")
           kv.set("diff_wrap_mode", current === "word" ? "none" : "word")
@@ -906,8 +905,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       {
         name: "app.toggle.paste_summary",
-        title: pasteSummaryEnabled() ? "Disable paste summary" : "Enable paste summary",
-        category: "System",
+        title: pasteSummaryEnabled() ? "Deshabilitar resumen de pegado" : "Habilitar resumen de pegado",
+        category: "Sistema",
         run: () => {
           setPasteSummaryEnabled((prev) => {
             const next = !prev
@@ -920,9 +919,9 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       {
         name: "app.toggle.session_directory_filter",
         title: kv.get("session_directory_filter_enabled", true)
-          ? "Disable session directory filtering"
-          : "Enable session directory filtering",
-        category: "System",
+          ? "Deshabilitar filtro de directorio de sesión"
+          : "Habilitar filtro de directorio de sesión",
+        category: "Sistema",
         run: async () => {
           kv.set("session_directory_filter_enabled", !kv.get("session_directory_filter_enabled", true))
           await sync.session.refresh()
@@ -986,7 +985,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       route.navigate({ type: "home" })
       toast.show({
         variant: "info",
-        message: "The current session was deleted",
+        message: "La sesión actual fue eliminada",
       })
     }
   })
@@ -1013,8 +1012,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
 
     const choice = await DialogConfirm.show(
       dialog,
-      `Update Available`,
-      `A new release v${version} is available. Would you like to update now?`,
+      `Actualización disponible`,
+      `Nueva versión v${version} disponible. ¿Querés actualizar ahora?`,
       "skip",
     )
 
@@ -1027,7 +1026,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
 
     toast.show({
       variant: "info",
-      message: `Updating to v${version}...`,
+      message: `Actualizando a v${version}...`,
       duration: 30000,
     })
 
@@ -1036,8 +1035,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
     if (result.error || !result.data?.success) {
       toast.show({
         variant: "error",
-        title: "Update Failed",
-        message: "Update failed",
+        title: "Actualización fallida",
+        message: "Error al actualizar",
         duration: 10000,
       })
       return
@@ -1045,8 +1044,8 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
 
     await DialogAlert.show(
       dialog,
-      "Update Complete",
-      `Successfully updated to OpenCode v${result.data.version}. Please restart the application.`,
+      "Actualización completa",
+      `Actualizado correctamente a ojito v${result.data.version}. Reiniciá la aplicación.`,
     )
 
     void exit()

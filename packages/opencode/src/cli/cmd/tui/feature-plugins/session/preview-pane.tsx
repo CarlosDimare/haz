@@ -178,9 +178,9 @@ export function SessionPreviewPane(props: {
 
   const statusLabel = createMemo(() => {
     const s = status()
-    if (s === "busy") return { text: "working", color: theme.warning }
-    if (s === "retry") return { text: "retrying", color: theme.warning }
-    return { text: "idle", color: theme.textMuted }
+    if (s === "busy") return { text: "trabajando", color: theme.warning }
+    if (s === "retry") return { text: "reintentando", color: theme.warning }
+    return { text: "inactivo", color: theme.textMuted }
   })
 
   return (

@@ -12,14 +12,14 @@ export function DialogAgent() {
       return {
         value: item.name,
         title: item.name,
-        description: item.native ? "native" : item.description,
+        description: item.native ? "nativo" : item.description,
       }
     }),
   )
 
   return (
     <DialogSelect
-      title="Select agent"
+      title="Seleccionar agente"
       current={local.agent.current()?.name}
       options={options()}
       onSelect={(option) => {

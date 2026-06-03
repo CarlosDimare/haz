@@ -19,12 +19,12 @@ export function DialogMessage(props: {
 
   return (
     <DialogSelect
-      title="Message Actions"
+      title="Acciones del Mensaje"
       options={[
         {
-          title: "Revert",
+          title: "Revertir",
           value: "session.revert",
-          description: "undo messages and file changes",
+          description: "deshacer mensajes y cambios de archivos",
           onSelect: (dialog) => {
             const msg = message()
             if (!msg) return
@@ -53,9 +53,9 @@ export function DialogMessage(props: {
           },
         },
         {
-          title: "Copy",
+          title: "Copiar",
           value: "message.copy",
-          description: "message text to clipboard",
+          description: "texto del mensaje al portapapeles",
           onSelect: async (dialog) => {
             const msg = message()
             if (!msg) return
@@ -73,9 +73,9 @@ export function DialogMessage(props: {
           },
         },
         {
-          title: "Fork",
+          title: "Bifurcar",
           value: "session.fork",
-          description: "create a new session",
+          description: "crear una nueva sesión",
           onSelect: async (dialog) => {
             const result = await sdk.client.session.fork({
               sessionID: props.sessionID,

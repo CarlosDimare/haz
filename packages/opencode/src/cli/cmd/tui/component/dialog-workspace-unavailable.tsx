@@ -25,9 +25,9 @@ export function DialogWorkspaceUnavailable(props: { onRestore?: () => boolean | 
 
   useBindings(() => ({
     bindings: [
-      { key: "return", desc: "Confirm workspace option", group: "Dialog", cmd: () => void confirm() },
-      { key: "left", desc: "Cancel workspace restore", group: "Dialog", cmd: () => setStore("active", "cancel") },
-      { key: "right", desc: "Restore workspace", group: "Dialog", cmd: () => setStore("active", "restore") },
+      { key: "return", desc: "Confirmar opción de espacio de trabajo", group: "Dialog", cmd: () => void confirm() },
+      { key: "left", desc: "Cancelar restauración de espacio", group: "Dialog", cmd: () => setStore("active", "cancel") },
+      { key: "right", desc: "Restaurar espacio de trabajo", group: "Dialog", cmd: () => setStore("active", "restore") },
     ],
   }))
 
@@ -35,17 +35,17 @@ export function DialogWorkspaceUnavailable(props: { onRestore?: () => boolean | 
     <box paddingLeft={2} paddingRight={2} gap={1}>
       <box flexDirection="row" justifyContent="space-between">
         <text attributes={TextAttributes.BOLD} fg={theme.text}>
-          Workspace Unavailable
+          Espacio de Trabajo No Disponible
         </text>
         <text fg={theme.textMuted} onMouseUp={() => dialog.clear()}>
           esc
         </text>
       </box>
       <text fg={theme.textMuted} wrapMode="word">
-        This session is attached to a workspace that is no longer available.
+        Esta sesión está vinculada a un espacio de trabajo que ya no está disponible.
       </text>
       <text fg={theme.textMuted} wrapMode="word">
-        Would you like to restore this session into a new workspace?
+        ¿Querés restaurar esta sesión en un nuevo espacio de trabajo?
       </text>
       <box flexDirection="row" justifyContent="flex-end" paddingBottom={1} gap={1}>
         <For each={options}>

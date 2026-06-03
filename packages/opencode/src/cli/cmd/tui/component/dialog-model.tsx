@@ -102,7 +102,7 @@ export function DialogModel(props: { providerID?: string }) {
           providers(),
           map((option) => ({
             ...option,
-            category: "Popular providers",
+            category: "Proveedores populares",
           })),
           take(6),
         )
@@ -124,7 +124,7 @@ export function DialogModel(props: { providerID?: string }) {
 
   const title = createMemo(() => {
     const value = provider()
-    if (!value) return "Select model"
+    if (!value) return "Seleccionar modelo"
     return value.name
   })
 
@@ -149,7 +149,7 @@ export function DialogModel(props: { providerID?: string }) {
       actions={[
         {
           command: "model.dialog.provider",
-          title: connected() ? "Connect provider" : "View all providers",
+          title: connected() ? "Conectar proveedor" : "Ver todos los proveedores",
           onTrigger() {
             dialog.replace(() => <DialogProvider />)
           },

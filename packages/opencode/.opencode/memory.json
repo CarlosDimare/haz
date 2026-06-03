@@ -1,0 +1,34 @@
+{
+  "entries": [
+    {
+      "id": "01KT4WPARNVDS0768DN3PFM6WE",
+      "frase": "Added sidebar button (☰) on home screen next to Ojito logo that opens session list dialog (DialogSessionList) - in packages/opencode/src/cli/cmd/tui/routes/home.tsx",
+      "created": 1780428253973
+    },
+    {
+      "id": "01KT4X6KYV8WHRZ6JCFYHCE780",
+      "frase": "Home sidebar toggle con ☰ en home.tsx que muestra facetas y habilidades (skills como Habilidades anidadas dentro de Facetas). Session sidebar también movió SkillsList dentro de Facetas y renombró Skills → Habilidades.",
+      "created": 1780428787675
+    },
+    {
+      "id": "01KT720TT2X8JTYKYQY649SW83",
+      "frase": "Replaced static facet system (loadFacets/facet-registry/facets.json) with dynamic facet-skills system. computeFacetsFromSkills(skills) derives facets from available skills + built-in tools (websearch, bash, read, write, edit, grep, glob, webfetch, task). computeExperienceBlend(sessions, messages, parts, facets) computes blend from ALL session messages with recency weighting. Skills that don't match any facet category get their own auto-generated facet. Both home sidebar (home.tsx) and session sidebar (sidebar.tsx) updated to use the new logic, replacing detectFacetBlend/matchSkillsToFacets/loadFacets calls. Old facet-registry.ts and facets.json no longer imported.",
+      "created": 1780500949826
+    },
+    {
+      "id": "01KT733B444W1AH449CNBJABYE",
+      "frase": "Separated personality from skills: facets renamed to \"Personalidad\" (3 static traits: Hacer, Decir, Saber based on system prompt tone). Skills moved to standalone \"Caja de Herramientas\" section listing all skills + built-in tools as a flat list. No more skill→facet classification. file: facet-skills.ts exports getPersonalityFacets() and getAllSkills(skills). Both home sidebar (home.tsx) and session sidebar (sidebar.tsx) updated with this layout. Old detectFacetBlend/computeFacetsFromSkills/computeSkillDistribution code removed from imports and usage. computeExperienceBlend kept in facet-skills.ts but unused.",
+      "created": 1780502080645
+    },
+    {
+      "id": "01KT73KZ0WA1M34N313HZHEPND",
+      "frase": "Personality now derived from actual system prompt (default.txt). loadPersonality() reads prompt file, parses section headers (# Tone and style, # Proactiveness, etc.) and final tone line to extract traits with real percentages. Traits displayed as bars (▓) with % labels in both home and session sidebars. Hacer/Decir/Saber replaced by dynamic traits like Brevedad, Humor, Precisión, Crítica, Ejecución. Skills remain as standalone Caja de Herramientas.",
+      "created": 1780502625309
+    },
+    {
+      "id": "01KT77EJ7TSA178DXE9AQEZFKP",
+      "frase": "Agent renamed from \"ojito\" to \"prisma\". Updated in .opencode/opencode.jsonc: default_agent, agent key, prompt text, and description. Product references to \"ojito\" (CLI commands, URLs, theme) kept unchanged as they refer to the opencode project.",
+      "created": 1780506642682
+    }
+  ]
+}

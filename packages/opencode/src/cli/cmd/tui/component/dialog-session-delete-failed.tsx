@@ -21,14 +21,14 @@ export function DialogSessionDeleteFailed(props: {
   const options = [
     {
       id: "delete" as const,
-      title: "Delete workspace",
-      description: "Delete the workspace and all sessions attached to it.",
+      title: "Eliminar espacio de trabajo",
+      description: "Eliminar el espacio de trabajo y todas las sesiones adjuntas.",
       run: props.onDelete,
     },
     {
       id: "restore" as const,
-      title: "Restore to new workspace",
-      description: "Try to restore this session into a new workspace.",
+      title: "Restaurar a nuevo espacio",
+      description: "Intentar restaurar esta sesión en un nuevo espacio de trabajo.",
       run: props.onRestore,
     },
   ]
@@ -42,11 +42,11 @@ export function DialogSessionDeleteFailed(props: {
 
   useBindings(() => ({
     bindings: [
-      { key: "return", desc: "Confirm recovery option", group: "Dialog", cmd: () => void confirm() },
-      { key: "left", desc: "Delete broken session", group: "Dialog", cmd: () => setStore("active", "delete") },
-      { key: "up", desc: "Delete broken session", group: "Dialog", cmd: () => setStore("active", "delete") },
-      { key: "right", desc: "Restore broken session", group: "Dialog", cmd: () => setStore("active", "restore") },
-      { key: "down", desc: "Restore broken session", group: "Dialog", cmd: () => setStore("active", "restore") },
+      { key: "return", desc: "Confirmar opción de recuperación", group: "Dialog", cmd: () => void confirm() },
+      { key: "left", desc: "Eliminar sesión dañada", group: "Dialog", cmd: () => setStore("active", "delete") },
+      { key: "up", desc: "Eliminar sesión dañada", group: "Dialog", cmd: () => setStore("active", "delete") },
+      { key: "right", desc: "Restaurar sesión dañada", group: "Dialog", cmd: () => setStore("active", "restore") },
+      { key: "down", desc: "Restaurar sesión dañada", group: "Dialog", cmd: () => setStore("active", "restore") },
     ],
   }))
 
@@ -54,17 +54,17 @@ export function DialogSessionDeleteFailed(props: {
     <box paddingLeft={2} paddingRight={2} gap={1}>
       <box flexDirection="row" justifyContent="space-between">
         <text attributes={TextAttributes.BOLD} fg={theme.text}>
-          Failed to Delete Session
+          Error al Eliminar Sesión
         </text>
         <text fg={theme.textMuted} onMouseUp={() => dialog.clear()}>
           esc
         </text>
       </box>
       <text fg={theme.textMuted} wrapMode="word">
-        {`The session "${props.session}" could not be deleted because the workspace "${props.workspace}" is not available.`}
+        {`La sesión "${props.session}" no pudo eliminarse porque el espacio de trabajo "${props.workspace}" no está disponible.`}
       </text>
       <text fg={theme.textMuted} wrapMode="word">
-        Choose how you want to recover this broken workspace session.
+        Elegí cómo querés recuperar esta sesión de espacio de trabajo dañada.
       </text>
       <box flexDirection="column" paddingBottom={1} gap={1}>
         <For each={options}>

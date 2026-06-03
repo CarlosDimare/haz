@@ -690,6 +690,7 @@ export function Logo(props: { shape?: LogoShape; ink?: RGBA; idle?: boolean } = 
     const shadow = tint(theme.background, ink, 0.25)
     const attrs = bold ? TextAttributes.BOLD : undefined
 
+    if (!line) return []
     return Array.from(line).map((char, i) => {
       if (char === " ") {
         return (
@@ -780,12 +781,21 @@ export function Logo(props: { shape?: LogoShape; ink?: RGBA; idle?: boolean } = 
         )
       }
 
+      // Box-drawing chars: render invisible (same as background)
+      if (char === "╔" || char === "╗" || char === "╚" || char === "╝" || char === "═" || char === "║") {
+        return (
+          <text fg={theme.background} attributes={attrs} selectable={false}>
+            {char}
+          </text>
+        )
+      }
+
       // Solid █: render as ▀ so the top pixel (fg) and bottom pixel (bg) can carry independent shimmer values
       if (char === "█" && useSubpixelBlocks()) {
         return (
           <text
-            fg={shade(inkTop, theme, n + p + e + b)}
-            bg={shade(inkBot, theme, n + p + e + b)}
+            fg={shade(PEAK, theme, n + p + e + b)}
+            bg={shade(PEAK, theme, n + p + e + b)}
             attributes={attrs}
             selectable={false}
           >

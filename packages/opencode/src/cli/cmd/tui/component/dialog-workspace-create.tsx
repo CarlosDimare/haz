@@ -66,7 +66,7 @@ async function loadWorkspaceAdapters(input: {
     return (await response.json()) as Adapter[]
   } catch (err) {
     input.toast.show({
-      title: "Failed to load workspace adapters",
+      title: "Error al cargar adaptadores de espacio de trabajo",
       message: errorMessage(err),
       variant: "error",
     })
@@ -111,7 +111,7 @@ export async function warpWorkspaceSession(input: {
     })
   } catch (err) {
     input.toast.show({
-      title: "Failed to warp session",
+      title: "Error al migrar sesión",
       message: errorMessage(err),
       variant: "error",
     })
@@ -121,15 +121,15 @@ export async function warpWorkspaceSession(input: {
     if (result?.error && "name" in result.error && result.error.name === "VcsApplyError") {
       await DialogAlert.show(
         input.dialog,
-        "Unable to Warp Session",
-        "Unable to apply file changes to this workspace. It has existing changes that conflict or is based off a different branch. Session has not been warped.",
+        "No se puede Mover la Sesión",
+        "No se pudieron aplicar los cambios de archivo a este espacio de trabajo. Tiene cambios existentes que entran en conflicto o está basado en una rama diferente. La sesión no se ha movido.",
       )
       return false
     }
 
     input.toast.show({
-      title: "Failed to warp session",
-      message: errorMessage(result?.error ?? "no response"),
+      title: "Error al mover sesión",
+      message: errorMessage(result?.error ?? "sin respuesta"),
       variant: "error",
     })
     return false
@@ -216,13 +216,13 @@ export function DialogWorkspaceSelect(props: {
         title: adapter.name,
         value: { type: "new" as const, workspaceType: adapter.type, workspaceName: adapter.name },
         description: adapter.description,
-        category: "New workspace",
+        category: "Nuevo espacio de trabajo",
       })),
       {
         title: "None",
         value: { type: "none" as const },
-        description: "Use the local project",
-        category: "Choose workspace",
+        description: "Usar el proyecto local",
+        category: "Elegir espacio de trabajo",
       },
       ...recent.map((workspace: Workspace) => ({
         title: workspace.name,
@@ -233,15 +233,15 @@ export function DialogWorkspaceSelect(props: {
           workspaceType: workspace.type,
           workspaceName: workspace.name,
         },
-        category: "Choose workspace",
+        category: "Elegir espacio de trabajo",
       })),
       ...(hasMore
         ? [
             {
-              title: "View all workspaces",
+              title: "Ver todos los espacios de trabajo",
               value: { type: "existing-list" as const },
-              description: "Choose from all workspaces",
-              category: "Choose workspace",
+              description: "Elegir entre todos los espacios de trabajo",
+              category: "Elegir espacio de trabajo",
             },
           ]
         : []),

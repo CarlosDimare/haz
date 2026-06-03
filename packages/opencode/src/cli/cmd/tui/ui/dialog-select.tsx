@@ -295,7 +295,7 @@ export function DialogSelect<T>(props: DialogSelectProps<T>) {
         },
         {
           name: "dialog.select.submit",
-          title: "Select item",
+          title: "Seleccionar elemento",
           category: "Dialog",
           run: submit,
         },
@@ -385,7 +385,7 @@ export function DialogSelect<T>(props: DialogSelectProps<T>) {
                   input.focus()
                 }, 1)
               }}
-              placeholder={props.placeholder ?? "Search"}
+              placeholder={props.placeholder ?? "Buscar"}
               placeholderColor={theme.textMuted}
             />
           </box>

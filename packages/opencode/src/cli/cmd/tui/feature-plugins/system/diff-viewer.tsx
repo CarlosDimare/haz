@@ -10,6 +10,7 @@ import path from "path"
 import { createEffect, createMemo, createResource, createSignal, For, Match, onCleanup, Show, Switch } from "solid-js"
 import { DiffViewerFileTree } from "./diff-viewer-file-tree"
 import { Panel, PanelGroup, Separator } from "./diff-viewer-ui"
+import { useDialog } from "@tui/ui/dialog"
 import { DialogSelect } from "@tui/ui/dialog-select"
 import { getScrollAcceleration } from "@tui/util/scroll"
 import {
@@ -373,7 +374,7 @@ function DiffViewer(props: { api: TuiPluginApi }) {
   const commands = [
     {
       name: "diff.close",
-      title: "Close diff viewer",
+      title: "Cerrar visor de diferencias",
       category: "VCS",
       run() {
         const returnRoute = params()?.returnRoute
@@ -605,21 +606,21 @@ function DiffViewer(props: { api: TuiPluginApi }) {
 
   const switchDiffOptions = createMemo(() => [
     {
-      title: "Working tree",
+      title: "Árbol de trabajo",
       value: "git" as const,
-      description: "Show current git changes",
+      description: "Mostrar cambios actuales de git",
     },
     {
-      title: "Last turn",
+      title: "Último turno",
       value: "last-turn" as const,
-      description: "Show changes from the last assistant turn",
+      description: "Mostrar cambios del último turno del asistente",
     },
   ])
 
   const openSwitchDiffDialog = () => {
     props.api.ui.dialog.replace(() => (
       <DialogSelect
-        title="Switch source"
+        title="Cambiar fuente"
         skipFilter={true}
         renderFilter={false}
         current={mode()}
@@ -647,11 +648,11 @@ function DiffViewer(props: { api: TuiPluginApi }) {
   useBindings(() => ({
     commands,
     bindings: [
-      { key: "j,down", cmd: "diff.down", desc: "Move diff viewer down" },
-      { key: "k,up", cmd: "diff.up", desc: "Move diff viewer up" },
-      { key: "pagedown,ctrl+f", cmd: "diff.page.down", desc: "Page diff viewer down" },
-      { key: "pageup,ctrl+b", cmd: "diff.page.up", desc: "Page diff viewer up" },
-      { key: "m", cmd: "diff.mark_reviewed", desc: "Mark selected file reviewed" },
+      { key: "j,down", cmd: "diff.down", desc: "Mover visor de diferencias abajo" },
+      { key: "k,up", cmd: "diff.up", desc: "Mover visor de diferencias arriba" },
+      { key: "pagedown,ctrl+f", cmd: "diff.page.down", desc: "Paginar visor abajo" },
+      { key: "pageup,ctrl+b", cmd: "diff.page.up", desc: "Paginar visor arriba" },
+      { key: "m", cmd: "diff.mark_reviewed", desc: "Marcar archivo como revisado" },
       ...props.api.tuiConfig.keybinds.gather(
         "diff",
         commands.map((command) => command.name),
@@ -664,10 +665,10 @@ function DiffViewer(props: { api: TuiPluginApi }) {
       <PanelGroup axis="y" width="100%" height="100%">
         <Panel border="none" flexShrink={0} padding={0} paddingLeft={1}>
           <text fg={theme().text}>Diff </text>
-          <text fg={theme().textMuted}>{mode() === "last-turn" ? "last turn" : "working tree"}</text>
+          <text fg={theme().textMuted}>{mode() === "last-turn" ? "último turno" : "árbol de trabajo"}</text>
           <box flexGrow={1} />
           <text fg={theme().textMuted}>
-            {files().length} {files().length === 1 ? "file" : "files"}
+            {files().length} {files().length === 1 ? "archivo" : "archivos"}
           </text>
         </Panel>
 
@@ -676,7 +677,7 @@ function DiffViewer(props: { api: TuiPluginApi }) {
             <Match when={diff.loading}>
               <Separator axis="x" />
               <box flexGrow={1} paddingLeft={1}>
-                <text fg={theme().textMuted}>Loading diff...</text>
+                <text fg={theme().textMuted}>Cargando diff...</text>
               </box>
             </Match>
             <Match when={!diff.loading && files().length === 0}>
@@ -840,56 +841,57 @@ function DiffViewer(props: { api: TuiPluginApi }) {
 
 function DiffViewerHelpDialog() {
   const { theme } = useTheme()
+  const dialog = useDialog()
   const rows = [
     {
       shortcut: () => "q",
-      action: "Close viewer",
-      description: "Quit the diff viewer",
+      action: "Cerrar visor",
+      description: "Salir del visor de diferencias",
     },
     {
       shortcut: useCommandShortcut("diff.switch_focus"),
-      action: "Focus file tree",
-      description: "Move keyboard focus between the file tree and patch pane",
+      action: "Enfocar árbol",
+      description: "Mover el foco entre el árbol de archivos y el panel de parches",
     },
     {
       shortcut: useCommandShortcut("diff.next_file"),
-      action: "Next file",
-      description: "Select the next changed file in file-tree order",
+      action: "Siguiente archivo",
+      description: "Seleccionar el siguiente archivo modificado en orden de árbol",
     },
     {
       shortcut: useCommandShortcut("diff.previous_file"),
-      action: "Previous file",
-      description: "Select the previous changed file in file-tree order",
+      action: "Archivo anterior",
+      description: "Seleccionar el archivo modificado anterior en orden de árbol",
     },
     {
       shortcut: useCommandShortcut("diff.toggle_file_tree"),
-      action: "Toggle file tree",
-      description: "Show or hide the file tree sidebar",
+      action: "Alternar árbol",
+      description: "Mostrar u ocultar la barra lateral del árbol de archivos",
     },
     {
       shortcut: useCommandShortcut("diff.single_patch"),
-      action: "Toggle patches",
-      description: "Switch between one selected patch and all patches",
+      action: "Alternar parches",
+      description: "Cambiar entre un parche seleccionado y todos los parches",
     },
     {
       shortcut: useCommandShortcut("diff.switch_source"),
-      action: "Switch source",
-      description: "Choose working tree or last-turn changes",
+      action: "Cambiar fuente",
+      description: "Elegir cambios del árbol de trabajo o del último turno",
     },
     {
       shortcut: useCommandShortcut("diff.toggle_view"),
-      action: "Toggle view",
-      description: "Switch between split and unified diff layout",
+      action: "Alternar vista",
+      description: "Cambiar entre diseño de diff dividido y unificado",
     },
     {
-      shortcut: useCommandShortcut("diff.expand_all"),
-      action: "Expand all folders",
-      description: "Open every folder in the file tree",
+      shortcut: useCommandShortcut("diff.toggle_expand_all"),
+      action: "Expandir todas las carpetas",
+      description: "Abrir todas las carpetas del árbol de archivos",
     },
     {
       shortcut: useCommandShortcut("diff.mark_reviewed"),
-      action: "Mark reviewed",
-      description: "Toggle reviewed state for the selected file",
+      action: "Marcar revisado",
+      description: "Alternar estado de revisado para el archivo seleccionado",
     },
   ]
 
@@ -897,18 +899,16 @@ function DiffViewerHelpDialog() {
     <box paddingLeft={2} paddingRight={2} paddingBottom={1} gap={1}>
       <box flexDirection="row" justifyContent="space-between">
         <text attributes={TextAttributes.BOLD} fg={theme.text}>
-          Diff shortcuts
+          Atajos de Diff
         </text>
-        <text fg={theme.textMuted}>esc</text>
+        <text fg={theme.textMuted} onMouseUp={() => dialog.clear()}>
+          esc
+        </text>
       </box>
-      <box flexDirection="row">
-        <text fg={theme.textMuted} width={5} wrapMode="none">
-          Key
-        </text>
-        <text fg={theme.textMuted} width={22} wrapMode="none">
-          Action
-        </text>
-        <text fg={theme.textMuted}>Description</text>
+      <box flexDirection="row" justifyContent="space-between" borderStyle="single" paddingLeft={1} paddingRight={1}>
+        <text fg={theme.textMuted}>Tecla</text>
+        <text fg={theme.textMuted}>Acción</text>
+        <text fg={theme.textMuted}>Descripción</text>
       </box>
       <For each={rows}>
         {(row) => (
@@ -939,7 +939,7 @@ const tui: TuiPlugin = async (api) => {
     commands: [
       {
         name: "diff.open",
-        title: "Open diff viewer",
+        title: "Abrir visor de diferencias",
         slashName: "diff",
         category: "VCS",
         namespace: "palette",

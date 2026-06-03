@@ -35,7 +35,7 @@ export function copy(renderer: Renderer, toast: Toast): boolean {
     focus?.getClipboardText && selection.selectedRenderables.includes(focus) ? focus.getClipboardText(text) : text
 
   Clipboard.copy(clipboardText)
-    .then(() => toast.show({ message: "Copied to clipboard", variant: "info" }))
+    .then(() => toast.show({ message: "Copiado al portapapeles", variant: "info" }))
     .catch(toast.error)
 
   renderer.clearSelection()

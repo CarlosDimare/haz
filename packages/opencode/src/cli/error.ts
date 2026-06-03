@@ -47,7 +47,7 @@ export function FormatError(input: unknown): string | undefined {
   // MCPFailed: { name: string }
   if (NamedError.hasName(input, "MCPFailed")) {
     const data = isRecord(input) && isRecord(input.data) ? stringField(input.data, "name") : undefined
-    return `MCP server "${data}" failed. Note, opencode does not support MCP authentication yet.`
+      return `MCP server "${data}" failed. ojito todavía no soporta autenticación MCP.`
   }
 
   // AccountServiceError, AccountTransportError: TaggedErrorClass
@@ -62,30 +62,30 @@ export function FormatError(input: unknown): string | undefined {
       ? providerModelNotFound.suggestions.filter((x) => typeof x === "string")
       : []
     return [
-      `Model not found: ${stringField(providerModelNotFound, "providerID")}/${stringField(providerModelNotFound, "modelID")}`,
-      ...(suggestions.length ? ["Did you mean: " + suggestions.join(", ")] : []),
-      `Try: \`opencode models\` to list available models`,
-      `Or check your config (opencode.json) provider/model names`,
+      `Modelo no encontrado: ${stringField(providerModelNotFound, "providerID")}/${stringField(providerModelNotFound, "modelID")}`,
+      ...(suggestions.length ? ["Quizás quisiste decir: " + suggestions.join(", ")] : []),
+      `Probá: \`ojito models\` para listar modelos disponibles`,
+      `O revisá los nombres en tu config (ojito.json)`,
     ].join("\n")
   }
 
   // ProviderInitError: { providerID: string }
   const providerInit = configData(input, "ProviderInitError")
   if (providerInit) {
-    return `Failed to initialize provider "${stringField(providerInit, "providerID")}". Check credentials and configuration.`
+    return `Error al inicializar el proveedor "${stringField(providerInit, "providerID")}". Revisá credenciales y configuración.`
   }
 
   // ConfigJsonError: { path: string, message?: string }
   const configJson = configData(input, "ConfigJsonError")
   if (configJson) {
     const message = stringField(configJson, "message")
-    return `Config file at ${stringField(configJson, "path")} is not valid JSON(C)` + (message ? `: ${message}` : "")
+    return `El archivo de config en ${stringField(configJson, "path")} no es JSON(C) válido` + (message ? `: ${message}` : "")
   }
 
   // ConfigDirectoryTypoError: { dir: string, path: string, suggestion: string }
   const configDirectoryTypo = configData(input, "ConfigDirectoryTypoError")
   if (configDirectoryTypo) {
-    return `Directory "${stringField(configDirectoryTypo, "dir")}" in ${stringField(configDirectoryTypo, "path")} is not valid. Rename the directory to "${stringField(configDirectoryTypo, "suggestion")}" or remove it. This is a common typo.`
+    return `El directorio "${stringField(configDirectoryTypo, "dir")}" en ${stringField(configDirectoryTypo, "path")} no es válido. Cambiale el nombre a "${stringField(configDirectoryTypo, "suggestion")}" o eliminalo. Es un error tipográfico común.`
   }
 
   // ConfigFrontmatterError: { message: string }
@@ -101,7 +101,7 @@ export function FormatError(input: unknown): string | undefined {
     const message = stringField(configInvalid, "message")
     const issues = configIssues(configInvalid)
     return [
-      `Configuration is invalid${path && path !== "config" ? ` at ${path}` : ""}` + (message ? `: ${message}` : ""),
+      `Configuración inválida${path && path !== "config" ? ` en ${path}` : ""}` + (message ? `: ${message}` : ""),
       ...issues.map((issue) => "↳ " + issue.message + " " + issue.path.join(".")),
     ].join("\n")
   }

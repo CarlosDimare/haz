@@ -39,9 +39,9 @@ export function DialogWorkspaceList() {
         return {
           title:
             removing() === workspace.id
-              ? "Deleting..."
+              ? "Eliminando..."
               : deleting() === workspace.id
-                ? `Delete ${workspace.name}? Press delete again`
+                ? `¿Eliminar ${workspace.name}? Presioná delete otra vez`
                 : workspace.name,
           value: { workspace },
           footer: workspace.type,
@@ -71,7 +71,7 @@ export function DialogWorkspaceList() {
       setRemoving(undefined)
       toast.show({
         variant: "error",
-        title: "Failed to delete workspace",
+        title: "Error al eliminar espacio de trabajo",
         message: errorMessage(result.error),
       })
       return

@@ -10,7 +10,7 @@ const tui: TuiPlugin = async (api) => {
     commands: [
       {
         name: "session.list",
-        title: "Switch session",
+        title: "Cambiar sesión",
         category: "Session",
         namespace: "palette",
         suggested: () => api.state.session.count() > 0,

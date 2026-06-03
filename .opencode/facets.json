@@ -1,0 +1,47 @@
+{
+  "hacer": {
+    "label": "Hacer",
+    "labelShort": "Hac",
+    "icon": "\u2699",
+    "color": "warning",
+    "description": "Arquitectura, implementación, debugging",
+    "keywords": ["código", "función", "clase", "implementar", "refactorizar", "bug", "error",
+      "test", "archivo", "componente", "api", "endpoint", "schema", "base de datos",
+      "typescript", "javascript", "react", "compilar", "desplegar",
+      "code", "function", "class", "implement", "refactor", "debug",
+      "test", "file", "component", "database", "build", "deploy", "compile",
+      "hacer", "crear", "construir", "arreglar", "fix", "build",
+      "código fuente", "repositorio", "rama", "pull request",
+      "dependencia", "librería", "framework", "stack", "performance"]
+  },
+  "decir": {
+    "label": "Decir",
+    "labelShort": "Dec",
+    "icon": "\u270E",
+    "color": "info",
+    "description": "Documentación, revisión, comunicación",
+    "keywords": ["revisar", "evaluar", "analizar", "comparar", "ventaja", "desventaja",
+      "problema", "mejorar", "optimizar", "revisión", "crítica", "señalar",
+      "review", "evaluate", "analyze", "compare", "pros", "cons",
+      "problem", "improve", "optimize", "critique", "feedback",
+      "decir", "opinar", "comunicar", "documentar", "escribir", "comentar",
+      "seguridad", "vulnerabilidad", "riesgo", "deuda técnica",
+      "mantenibilidad", "escalabilidad", "acoplamiento",
+      "security", "code review", "mal", "code smell", "antipatrón"]
+  },
+  "saber": {
+    "label": "Saber",
+    "labelShort": "Sab",
+    "icon": "\u25CE",
+    "color": "success",
+    "description": "Investigación, análisis, aprendizaje",
+    "keywords": ["investigar", "buscar", "leer", "documentación", "aprender", "entender",
+      "qué es", "cómo funciona", "contexto", "historia", "noticia", "artículo",
+      "research", "search", "read", "documentation", "learn", "understand",
+      "what is", "how does", "context", "news", "article", "paper",
+      "saber", "conocer", "analizar", "comparativa", "versus", "vs",
+      "por qué", "para qué", "motivo", "razón", "causa",
+      "alternativa", "fuente", "referencia", "citar",
+      "alternative", "comparison", "difference", "why", "reason"]
+  }
+}

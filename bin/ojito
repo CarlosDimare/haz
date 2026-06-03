@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+exec bun run --cwd /home/runner/workspace/cosito2/packages/opencode --conditions=browser src/index.ts "$@"

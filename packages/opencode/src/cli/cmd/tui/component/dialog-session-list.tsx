@@ -58,7 +58,7 @@ export function DialogSessionList() {
           result = await sdk.client.experimental.workspace.create({ type: selection.workspaceType, branch: null })
         } catch (err) {
           toast.show({
-            title: "Failed to create workspace",
+            title: "Error al crear espacio de trabajo",
             message: errorMessage(err),
             variant: "error",
           })
@@ -67,8 +67,8 @@ export function DialogSessionList() {
         const workspace = result?.data
         if (!workspace) {
           toast.show({
-            title: "Failed to create workspace",
-            message: errorMessage(result?.error ?? "no response"),
+            title: "Error al crear espacio de trabajo",
+            message: errorMessage(result?.error ?? "sin respuesta"),
             variant: "error",
           })
           return
@@ -102,7 +102,7 @@ export function DialogSessionList() {
           if (result.error) {
             toast.show({
               variant: "error",
-              title: "Failed to delete workspace",
+              title: "Error al eliminar espacio de trabajo",
               message: errorMessage(result.error),
             })
             return false
@@ -268,7 +268,7 @@ export function DialogSessionList() {
                   } else {
                     toast.show({
                       variant: "error",
-                      title: "Failed to delete session",
+                      title: "Error al eliminar sesión",
                       message: errorMessage(result.error),
                     })
                   }
@@ -281,7 +281,7 @@ export function DialogSessionList() {
                 } else {
                   toast.show({
                     variant: "error",
-                    title: "Failed to delete session",
+                    title: "Error al eliminar sesión",
                     message: errorMessage(err),
                   })
                 }
@@ -300,7 +300,7 @@ export function DialogSessionList() {
         },
         {
           command: "session.rename",
-          title: "rename",
+          title: "renombrar",
           onTrigger: async (option) => {
             dialog.replace(() => <DialogSessionRename session={option.value} />)
           },
@@ -313,6 +313,6 @@ export function DialogSessionList() {
 
 function quickSwitchRange(first: string, last: string) {
   const prefix = first.slice(0, -1)
-  if (first.endsWith("1") && last === `${prefix}9`) return `${prefix}1-9`
-  return `${first} through ${last}`
+  if (first.endsWith("1") && last === `${prefix}9`)   return `${prefix}1-9`
+  return `${first} a ${last}`
 }

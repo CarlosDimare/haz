@@ -37,7 +37,7 @@ export function DialogConsoleOrg() {
     if (listed === undefined) {
       return [
         {
-          title: "Loading orgs...",
+          title: "Cargando organizaciones...",
           value: "loading",
           onSelect: () => {},
         },
@@ -47,7 +47,7 @@ export function DialogConsoleOrg() {
     if (listed.length === 0) {
       return [
         {
-          title: "No orgs found",
+          title: "No se encontraron organizaciones",
           value: "empty",
           onSelect: () => {},
         },
@@ -91,7 +91,7 @@ export function DialogConsoleOrg() {
 
           await sdk.client.instance.dispose()
           toast.show({
-            message: `Switched to ${item.orgName}`,
+            message: `Cambiado a ${item.orgName}`,
             variant: "info",
           })
           dialog.clear()
@@ -99,5 +99,5 @@ export function DialogConsoleOrg() {
       }))
   })
 
-  return <DialogSelect<string | OrgOption> title="Switch org" options={options()} current={current()} />
+  return <DialogSelect<string | OrgOption> title="Cambiar organización" options={options()} current={current()} />
 }

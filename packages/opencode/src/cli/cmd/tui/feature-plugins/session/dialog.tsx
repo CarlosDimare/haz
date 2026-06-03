@@ -72,7 +72,7 @@ export function SessionSwitcherDialog() {
         const created = result?.data
         if (!created) {
           toast.show({
-            message: `Failed to create workspace: ${errorMessage(result?.error ?? "no response")}`,
+            message: `Error al crear espacio de trabajo: ${errorMessage(result?.error ?? "sin respuesta")}`,
             variant: "error",
           })
           return
@@ -106,7 +106,7 @@ export function SessionSwitcherDialog() {
           if (result.error) {
             toast.show({
               variant: "error",
-              title: "Failed to delete workspace",
+              title: "Error al eliminar espacio de trabajo",
               message: errorMessage(result.error),
             })
             return false
@@ -153,7 +153,7 @@ export function SessionSwitcherDialog() {
   })
   const quickSwitchFooterHints = createMemo(() => {
     const hint = quickSwitchHint()
-    return hint && local.session.slots().length > 0 ? [{ title: "switch", label: hint }] : []
+    return hint && local.session.slots().length > 0 ? [{ title: "cambiar", label: hint }] : []
   })
 
   const options = createMemo<DialogSelectOption<string>[]>(() => {
@@ -188,7 +188,7 @@ export function SessionSwitcherDialog() {
         : slot !== undefined
           ? () => <text fg={theme.accent}>{slot}</text>
           : undefined
-      const titleText = isDeleting ? `Press ${deleteHint()} again to confirm` : isWorktree ? `⎇ ${x.title}` : x.title
+      const titleText = isDeleting ? `Presioná ${deleteHint()} otra vez para confirmar` : isWorktree ? `⎇ ${x.title}` : x.title
       return {
         title: titleText,
         bg: isDeleting ? theme.error : undefined,
@@ -205,12 +205,12 @@ export function SessionSwitcherDialog() {
         const x = sessionMap.get(id)
         if (!x) return undefined
         const label = new Date(x.time.updated).toDateString()
-        return buildOption(id, label === today ? "Today" : label)
+        return buildOption(id, label === today ? "Hoy" : label)
       })
       .filter((x): x is DialogSelectOption<string> => x !== undefined)
 
     return [
-      ...pinned.map((id) => buildOption(id, "Pinned")).filter((x): x is DialogSelectOption<string> => x !== undefined),
+      ...pinned.map((id) => buildOption(id, "Fijadas")).filter((x): x is DialogSelectOption<string> => x !== undefined),
       ...remaining,
     ]
   })
@@ -231,7 +231,7 @@ export function SessionSwitcherDialog() {
   const list = (
     <DialogSelect
       ref={(value) => (select = value)}
-      title="Sessions"
+      title="Sesiones"
       options={options()}
       skipFilter={true}
       current={currentSessionID()}
@@ -250,14 +250,14 @@ export function SessionSwitcherDialog() {
       actions={[
         {
           command: "session.pin.toggle",
-          title: "pin/unpin",
+          title: "fijar/desfijar",
           onTrigger: (option: { value: string }) => {
             local.session.togglePin(option.value)
           },
         },
         {
           command: "session.delete",
-          title: "delete",
+          title: "eliminar",
           onTrigger: async (option) => {
             if (toDelete() === option.value) {
               const session = sessions().find((item) => item.id === option.value)
@@ -273,7 +273,7 @@ export function SessionSwitcherDialog() {
                   } else {
                     toast.show({
                       variant: "error",
-                      title: "Failed to delete session",
+                      title: "Error al eliminar sesión",
                       message: errorMessage(result.error),
                     })
                   }
@@ -286,7 +286,7 @@ export function SessionSwitcherDialog() {
                 } else {
                   toast.show({
                     variant: "error",
-                    title: "Failed to delete session",
+                    title: "Error al eliminar sesión",
                     message: errorMessage(err),
                   })
                 }
@@ -305,7 +305,7 @@ export function SessionSwitcherDialog() {
         },
         {
           command: "session.rename",
-          title: "rename",
+          title: "renombrar",
           onTrigger: async (option) => {
             dialog.replace(() => <DialogSessionRename session={option.value} />)
           },

@@ -221,7 +221,7 @@ export function Session() {
 
   const dimensions = useTerminalDimensions()
   const [sidebar, setSidebar] = kv.signal<"auto" | "hide">("sidebar", "auto")
-  const [sidebarOpen, setSidebarOpen] = createSignal(false)
+  const [sidebarOpen, setSidebarOpen] = createSignal(true)
   const [conceal, setConceal] = createSignal(true)
   const thinking = useThinkingMode()
   const thinkingMode = thinking.mode
@@ -423,7 +423,7 @@ export function Session() {
       sessionID,
     })
     const status = sync.data.session_status[sessionID]
-    if (status?.type === "retry") void DialogAlert.show(dialog, "Retry Error", status.message)
+    if (status?.type === "retry") void DialogAlert.show(dialog, "Error de Reintento", status.message)
   }
 
   function moveFirstChild() {
@@ -452,10 +452,10 @@ export function Session() {
 
   const sessionCommandList = createMemo(() => [
     {
-      title: session()?.share?.url ? "Copy share link" : "Share session",
+      title: session()?.share?.url ? "Copiar enlace de compartir" : "Compartir sesión",
       value: "session.share",
       suggested: route.type === "session",
-      category: "Session",
+      category: "Sesión",
       enabled: sync.data.config.share !== "disabled",
       slash: {
         name: "share",
@@ -463,8 +463,8 @@ export function Session() {
       run: async () => {
         const copy = (url: string) =>
           Clipboard.copy(url)
-            .then(() => toast.show({ message: "Share URL copied to clipboard!", variant: "success" }))
-            .catch(() => toast.show({ message: "Failed to copy URL to clipboard", variant: "error" }))
+            .then(() => toast.show({ message: "¡Enlace de compartir copiado al portapapeles!", variant: "success" }))
+            .catch(() => toast.show({ message: "Error al copiar enlace al portapapeles", variant: "error" }))
         const url = session()?.share?.url
         if (url) {
           await copy(url)
@@ -472,7 +472,7 @@ export function Session() {
           return
         }
         if (!kv.get("share_consent", false)) {
-          const ok = await DialogConfirm.show(dialog, "Share Session", "Are you sure you want to share it?")
+          const ok = await DialogConfirm.show(dialog, "Compartir Sesión", "¿Estás seguro de que querés compartirla?")
           if (ok !== true) return
           kv.set("share_consent", true)
         }
@@ -483,7 +483,7 @@ export function Session() {
           .then((res) => copy(res.data!.share!.url))
           .catch((error) => {
             toast.show({
-              message: error instanceof Error ? error.message : "Failed to share session",
+              message: error instanceof Error ? error.message : "Error al compartir sesión",
               variant: "error",
             })
           })
@@ -491,9 +491,9 @@ export function Session() {
       },
     },
     {
-      title: "Rename session",
+      title: "Renombrar sesión",
       value: "session.rename",
-      category: "Session",
+      category: "Sesión",
       slash: {
         name: "rename",
       },
@@ -502,9 +502,9 @@ export function Session() {
       },
     },
     {
-      title: "Jump to message",
+      title: "Saltar al mensaje",
       value: "session.timeline",
-      category: "Session",
+      category: "Sesión",
       slash: {
         name: "timeline",
       },
@@ -524,9 +524,9 @@ export function Session() {
       },
     },
     {
-      title: "Fork session",
+      title: "Bifurcar sesión",
       value: "session.fork",
-      category: "Session",
+      category: "Sesión",
       slash: {
         name: "fork",
       },
@@ -546,9 +546,9 @@ export function Session() {
       },
     },
     {
-      title: "Compact session",
+      title: "Compactar sesión",
       value: "session.compact",
-      category: "Session",
+      category: "Sesión",
       slash: {
         name: "compact",
         aliases: ["summarize"],
@@ -558,7 +558,7 @@ export function Session() {
         if (!selectedModel) {
           toast.show({
             variant: "warning",
-            message: "Connect a provider to summarize this session",
+            message: "Conectá un proveedor para resumir esta sesión",
             duration: 3000,
           })
           return
@@ -572,9 +572,9 @@ export function Session() {
       },
     },
     {
-      title: "Unshare session",
+      title: "Dejar de compartir sesión",
       value: "session.unshare",
-      category: "Session",
+      category: "Sesión",
       enabled: !!session()?.share?.url,
       slash: {
         name: "unshare",
@@ -584,10 +584,10 @@ export function Session() {
           .unshare({
             sessionID: route.sessionID,
           })
-          .then(() => toast.show({ message: "Session unshared successfully", variant: "success" }))
+          .then(() => toast.show({               message: "Sesión dejada de compartir exitosamente", variant: "success" }))
           .catch((error) => {
             toast.show({
-              message: error instanceof Error ? error.message : "Failed to unshare session",
+              message: error instanceof Error ? error.message : "Error al dejar de compartir sesión",
               variant: "error",
             })
           })
@@ -595,9 +595,9 @@ export function Session() {
       },
     },
     {
-      title: "Undo previous message",
+      title: "Deshacer mensaje anterior",
       value: "session.undo",
-      category: "Session",
+      category: "Sesión",
       slash: {
         name: "undo",
       },
@@ -632,9 +632,9 @@ export function Session() {
       },
     },
     {
-      title: "Redo",
+      title: "Rehacer",
       value: "session.redo",
-      category: "Session",
+      category: "Sesión",
       enabled: !!session()?.revert?.messageID,
       slash: {
         name: "redo",
@@ -658,9 +658,9 @@ export function Session() {
       },
     },
     {
-      title: sidebarVisible() ? "Hide sidebar" : "Show sidebar",
+      title: sidebarVisible() ? "Ocultar barra lateral" : "Mostrar barra lateral",
       value: "session.sidebar.toggle",
-      category: "Session",
+      category: "Sesión",
       run: () => {
         batch(() => {
           const isVisible = sidebarVisible()
@@ -671,18 +671,18 @@ export function Session() {
       },
     },
     {
-      title: conceal() ? "Disable code concealment" : "Enable code concealment",
+      title: conceal() ? "Deshabilitar ocultamiento de código" : "Habilitar ocultamiento de código",
       value: "session.toggle.conceal",
-      category: "Session",
+      category: "Sesión",
       run: () => {
         setConceal((prev) => !prev)
         dialog.clear()
       },
     },
     {
-      title: showTimestamps() ? "Hide timestamps" : "Show timestamps",
+      title: showTimestamps() ? "Ocultar marcas de tiempo" : "Mostrar marcas de tiempo",
       value: "session.toggle.timestamps",
-      category: "Session",
+      category: "Sesión",
       slash: {
         name: "timestamps",
         aliases: ["toggle-timestamps"],
@@ -695,11 +695,11 @@ export function Session() {
     {
       title: (() => {
         const next = nextThinkingMode(thinkingMode())
-        if (next === "hide") return "Collapse thinking"
-        return "Expand thinking"
+        if (next === "hide") return "Contraer pensamiento"
+        return "Expandir pensamiento"
       })(),
       value: "session.toggle.thinking",
-      category: "Session",
+      category: "Sesión",
       slash: {
         name: "thinking",
         aliases: ["toggle-thinking"],
@@ -710,36 +710,36 @@ export function Session() {
       },
     },
     {
-      title: showDetails() ? "Hide tool details" : "Show tool details",
+      title: showDetails() ? "Ocultar detalles de herramientas" : "Mostrar detalles de herramientas",
       value: "session.toggle.actions",
-      category: "Session",
+      category: "Sesión",
       run: () => {
         setShowDetails((prev) => !prev)
         dialog.clear()
       },
     },
     {
-      title: "Toggle session scrollbar",
+      title: "Alternar barra de desplazamiento",
       value: "session.toggle.scrollbar",
-      category: "Session",
+      category: "Sesión",
       run: () => {
         setShowScrollbar((prev) => !prev)
         dialog.clear()
       },
     },
     {
-      title: showGenericToolOutput() ? "Hide generic tool output" : "Show generic tool output",
+      title: showGenericToolOutput() ? "Ocultar salida genérica de herramientas" : "Mostrar salida genérica de herramientas",
       value: "session.toggle.generic_tool_output",
-      category: "Session",
+      category: "Sesión",
       run: () => {
         setShowGenericToolOutput((prev) => !prev)
         dialog.clear()
       },
     },
     {
-      title: "Page up",
+      title: "Página arriba",
       value: "session.page.up",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       run: () => {
         scroll.scrollBy(-scroll.height / 2)
@@ -747,9 +747,9 @@ export function Session() {
       },
     },
     {
-      title: "Page down",
+      title: "Página abajo",
       value: "session.page.down",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       run: () => {
         scroll.scrollBy(scroll.height / 2)
@@ -757,9 +757,9 @@ export function Session() {
       },
     },
     {
-      title: "Line up",
+      title: "Línea arriba",
       value: "session.line.up",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       run: () => {
         scroll.scrollBy(-1)
@@ -767,9 +767,9 @@ export function Session() {
       },
     },
     {
-      title: "Line down",
+      title: "Línea abajo",
       value: "session.line.down",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       run: () => {
         scroll.scrollBy(1)
@@ -777,9 +777,9 @@ export function Session() {
       },
     },
     {
-      title: "Half page up",
+      title: "Media página arriba",
       value: "session.half.page.up",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       run: () => {
         scroll.scrollBy(-scroll.height / 4)
@@ -787,9 +787,9 @@ export function Session() {
       },
     },
     {
-      title: "Half page down",
+      title: "Media página abajo",
       value: "session.half.page.down",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       run: () => {
         scroll.scrollBy(scroll.height / 4)
@@ -797,9 +797,9 @@ export function Session() {
       },
     },
     {
-      title: "First message",
+      title: "Primer mensaje",
       value: "session.first",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       run: () => {
         scroll.scrollTo(0)
@@ -807,9 +807,9 @@ export function Session() {
       },
     },
     {
-      title: "Last message",
+      title: "Último mensaje",
       value: "session.last",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       run: () => {
         scroll.scrollTo(scroll.scrollHeight)
@@ -817,9 +817,9 @@ export function Session() {
       },
     },
     {
-      title: "Jump to last user message",
+      title: "Saltar al último mensaje del usuario",
       value: "session.messages_last_user",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       run: () => {
         const messages = sync.data.message[route.sessionID]
@@ -848,30 +848,30 @@ export function Session() {
       },
     },
     {
-      title: "Next message",
+      title: "Siguiente mensaje",
       value: "session.message.next",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       run: () => scrollToMessage("next", dialog),
     },
     {
-      title: "Previous message",
+      title: "Mensaje anterior",
       value: "session.message.previous",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       run: () => scrollToMessage("prev", dialog),
     },
     {
-      title: "Copy last assistant message",
+      title: "Copiar último mensaje del asistente",
       value: "messages.copy",
-      category: "Session",
+      category: "Sesión",
       run: () => {
         const revertID = session()?.revert?.messageID
         const lastAssistantMessage = messages().findLast(
           (msg) => msg.role === "assistant" && (!revertID || msg.id < revertID),
         )
         if (!lastAssistantMessage) {
-          toast.show({ message: "No assistant messages found", variant: "error" })
+          toast.show({ message: "No se encontraron mensajes del asistente", variant: "error" })
           dialog.clear()
           return
         }
@@ -879,7 +879,7 @@ export function Session() {
         const parts = sync.data.part[lastAssistantMessage.id] ?? []
         const textParts = parts.filter((part) => part.type === "text")
         if (textParts.length === 0) {
-          toast.show({ message: "No text parts found in last assistant message", variant: "error" })
+          toast.show({ message: "No se encontraron partes de texto en el último mensaje del asistente", variant: "error" })
           dialog.clear()
           return
         }
@@ -890,7 +890,7 @@ export function Session() {
           .trim()
         if (!text) {
           toast.show({
-            message: "No text content found in last assistant message",
+            message: "No se encontró contenido de texto en el último mensaje del asistente",
             variant: "error",
           })
           dialog.clear()
@@ -898,15 +898,15 @@ export function Session() {
         }
 
         Clipboard.copy(text)
-          .then(() => toast.show({ message: "Message copied to clipboard!", variant: "success" }))
-          .catch(() => toast.show({ message: "Failed to copy to clipboard", variant: "error" }))
+          .then(() => toast.show({ message: "¡Mensaje copiado al portapapeles!", variant: "success" }))
+          .catch(() => toast.show({ message: "Error al copiar al portapapeles", variant: "error" }))
         dialog.clear()
       },
     },
     {
-      title: "Copy session transcript",
+      title: "Copiar transcripción de sesión",
       value: "session.copy",
-      category: "Session",
+      category: "Sesión",
       slash: {
         name: "copy",
       },
@@ -926,17 +926,17 @@ export function Session() {
             },
           )
           await Clipboard.copy(transcript)
-          toast.show({ message: "Session transcript copied to clipboard!", variant: "success" })
+          toast.show({ message: "¡Transcripción de sesión copiada al portapapeles!", variant: "success" })
         } catch {
-          toast.show({ message: "Failed to copy session transcript", variant: "error" })
+          toast.show({ message: "Error al copiar transcripción de la sesión", variant: "error" })
         }
         dialog.clear()
       },
     },
     {
-      title: "Export session transcript",
+      title: "Exportar transcripción de sesión",
       value: "session.export",
-      category: "Session",
+      category: "Sesión",
       slash: {
         name: "export",
       },
@@ -1000,18 +1000,18 @@ export function Session() {
               await Filesystem.write(filepath, result)
             }
 
-            toast.show({ message: `Session exported to ${filename}`, variant: "success" })
+            toast.show({ message: `Sesión exportada a ${filename}`, variant: "success" })
           }
         } catch {
-          toast.show({ message: "Failed to export session", variant: "error" })
+          toast.show({ message: "Error al exportar sesión", variant: "error" })
         }
         dialog.clear()
       },
     },
     {
-      title: "Go to child session",
+      title: "Ir a sesión hija",
       value: "session.child.first",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       run: () => {
         dialog.clear()
@@ -1019,9 +1019,9 @@ export function Session() {
       },
     },
     {
-      title: "Go to parent session",
+      title: "Ir a sesión padre",
       value: "session.parent",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       enabled: !!session()?.parentID,
       run: childSessionHandler(() => {
@@ -1036,9 +1036,9 @@ export function Session() {
       }),
     },
     {
-      title: "Next child session",
+      title: "Siguiente sesión hija",
       value: "session.child.next",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       enabled: !!session()?.parentID,
       run: childSessionHandler(() => {
@@ -1047,9 +1047,9 @@ export function Session() {
       }),
     },
     {
-      title: "Previous child session",
+      title: "Sesión hija anterior",
       value: "session.child.previous",
-      category: "Session",
+      category: "Sesión",
       hidden: true,
       enabled: !!session()?.parentID,
       run: childSessionHandler(() => {
@@ -1168,8 +1168,8 @@ export function Session() {
                           const handleUnrevert = async () => {
                             const confirmed = await DialogConfirm.show(
                               dialog,
-                              "Confirm Redo",
-                              "Are you sure you want to restore the reverted messages?",
+                              "Confirmar Rehacer",
+                              "¿Estás seguro de que querés restaurar los mensajes revertidos?",
                             )
                             if (confirmed) {
                               keymap.dispatchCommand("session.redo")
@@ -1193,9 +1193,9 @@ export function Session() {
                                 paddingLeft={2}
                                 backgroundColor={hover() ? theme.backgroundElement : theme.backgroundPanel}
                               >
-                                <text fg={theme.textMuted}>{revert()!.reverted.length} message reverted</text>
+                                <text fg={theme.textMuted}>{revert()!.reverted.length} mensaje revertido</text>
                                 <text fg={theme.textMuted}>
-                                  <span style={{ fg: theme.text }}>{redoShortcut()}</span> or /redo to restore
+                                  <span style={{ fg: theme.text }}>{redoShortcut()}</span> o /redo para restaurar
                                 </text>
                                 <Show when={revert()!.diffFiles?.length}>
                                   <box marginTop={1}>
@@ -1279,7 +1279,23 @@ export function Session() {
                         toBottom()
                       }}
                       sessionID={route.sessionID}
-                      right={<TuiPluginRuntime.Slot name="session_prompt_right" session_id={route.sessionID} />}
+                      right={
+                        <>
+                          <text
+                            fg={theme.textMuted}
+                            onMouseDown={() => {
+                              const isVisible = sidebarVisible()
+                              batch(() => {
+                                setSidebar(() => (isVisible ? "hide" : "auto"))
+                                setSidebarOpen(!isVisible)
+                              })
+                            }}
+                          >
+                            ☰
+                          </text>
+                          <TuiPluginRuntime.Slot name="session_prompt_right" session_id={route.sessionID} />
+                        </>
+                      }
                     />
                   </TuiPluginRuntime.Slot>
                 </Show>
@@ -1290,7 +1306,18 @@ export function Session() {
           <Show when={sidebarVisible()}>
             <Switch>
               <Match when={wide()}>
-                <Sidebar sessionID={route.sessionID} />
+                <Sidebar sessionID={route.sessionID} onClose={() => {
+                  const isVisible = sidebarVisible()
+                  batch(() => {
+                    setSidebar(() => (isVisible ? "hide" : "auto"))
+                    setSidebarOpen(!isVisible)
+                  })
+                }} onImproveSkill={(skill) => {
+                  if (prompt) {
+                    prompt.set({ input: `Mejorar: ${skill}`, parts: [] })
+                    prompt.focus()
+                  }
+                }} />
               </Match>
               <Match when={!wide()}>
                 <box
@@ -1301,8 +1328,26 @@ export function Session() {
                   bottom={0}
                   alignItems="flex-end"
                   backgroundColor={RGBA.fromInts(0, 0, 0, 70)}
+                  onMouseDown={() => {
+                    const isVisible = sidebarVisible()
+                    batch(() => {
+                      setSidebar(() => (isVisible ? "hide" : "auto"))
+                      setSidebarOpen(!isVisible)
+                    })
+                  }}
                 >
-                  <Sidebar sessionID={route.sessionID} />
+                  <Sidebar sessionID={route.sessionID} onClose={() => {
+                    const isVisible = sidebarVisible()
+                    batch(() => {
+                      setSidebar(() => (isVisible ? "hide" : "auto"))
+                      setSidebarOpen(!isVisible)
+                    })
+                  }} onImproveSkill={(skill) => {
+                    if (prompt) {
+                      prompt.set({ input: `Mejorar: ${skill}`, parts: [] })
+                      prompt.focus()
+                    }
+                  }} />
                 </box>
               </Match>
             </Switch>
@@ -1435,8 +1480,6 @@ function AssistantMessage(props: { message: AssistantMessage; parts: Part[]; las
   const { theme } = useTheme()
   const sync = useSync()
   const messages = createMemo(() => sync.data.message[props.message.sessionID] ?? [])
-  const model = createMemo(() => Model.name(ctx.providers(), props.message.providerID, props.message.modelID))
-
   const final = createMemo(() => {
     return props.message.finish && !["tool-calls", "unknown"].includes(props.message.finish)
   })
@@ -1505,7 +1548,7 @@ function AssistantMessage(props: { message: AssistantMessage; parts: Part[]; las
                 ▣{" "}
               </span>{" "}
               <span style={{ fg: theme.text }}>{Locale.titlecase(props.message.mode)}</span>
-              <span style={{ fg: theme.textMuted }}> · {model()}</span>
+
               <Show when={duration()}>
                 <span style={{ fg: theme.textMuted }}> · {Locale.duration(duration())}</span>
               </Show>
@@ -1602,7 +1645,7 @@ function ReasoningHeader(props: {
     <Switch>
       <Match when={!props.done}>
         <box flexDirection="row">
-          <Spinner color={fg()}>{props.title ? "Thinking: " + props.title : "Thinking"}</Spinner>
+          <Spinner color={fg()}>{props.title ? "Pensando: " + props.title : "Pensando"}</Spinner>
         </box>
       </Match>
       <Match when={true}>
@@ -1610,7 +1653,7 @@ function ReasoningHeader(props: {
           <Show when={props.toggleable}>
             <span>{props.open ? "- " : "+ "}</span>
           </Show>
-          <span>Thought</span>
+          <span>Pensamiento</span>
           <Show when={props.title || props.duration}>
             <span>: </span>
           </Show>
@@ -1761,7 +1804,7 @@ function GenericTool(props: ToolProps<any>) {
     <Show
       when={props.output && ctx.showGenericToolOutput()}
       fallback={
-        <InlineTool icon="⚙" pending="Writing command..." complete={true} part={props.part}>
+        <InlineTool icon="⚙" pending="Ejecutando comando..." complete={true} part={props.part}>
           {props.tool} {input(props.input)}
         </InlineTool>
       }
@@ -1774,7 +1817,7 @@ function GenericTool(props: ToolProps<any>) {
         <box gap={1}>
           <text fg={theme.text}>{limited()}</text>
           <Show when={collapsed().overflow}>
-            <text fg={theme.textMuted}>{expanded() ? "Click to collapse" : "Click to expand"}</text>
+            <text fg={theme.textMuted}>{expanded() ? "Hacer clic para colapsar" : "Hacer clic para expandir"}</text>
           </Show>
         </box>
       </BlockTool>
@@ -2028,7 +2071,7 @@ function Shell(props: ToolProps<typeof ShellTool>) {
   })
 
   const title = createMemo(() => {
-    const desc = props.input.description ?? "Shell"
+    const desc = props.input.description ?? "Terminal"
     const wd = workdirDisplay()
     if (!wd) return `# ${desc}`
     if (desc.includes(wd)) return `# ${desc}`
@@ -2050,13 +2093,13 @@ function Shell(props: ToolProps<typeof ShellTool>) {
               <text fg={theme.text}>{limited()}</text>
             </Show>
             <Show when={collapsed().overflow}>
-              <text fg={theme.textMuted}>{expanded() ? "Click to collapse" : "Click to expand"}</text>
+              <text fg={theme.textMuted}>{expanded() ? "Hacer clic para colapsar" : "Hacer clic para expandir"}</text>
             </Show>
           </box>
         </BlockTool>
       </Match>
       <Match when={true}>
-        <InlineTool icon="$" pending="Writing command..." complete={props.input.command} part={props.part}>
+        <InlineTool icon="$" pending="Ejecutando comando..." complete={props.input.command} part={props.part}>
           {props.input.command}
         </InlineTool>
       </Match>
@@ -2089,8 +2132,8 @@ function Write(props: ToolProps<typeof WriteTool>) {
         </BlockTool>
       </Match>
       <Match when={true}>
-        <InlineTool icon="←" pending="Preparing write..." complete={props.input.filePath} part={props.part}>
-          Write {pathFormatter.format(props.input.filePath)}
+        <InlineTool icon="←" pending="Preparando escritura..." complete={props.input.filePath} part={props.part}>
+          Escribir {pathFormatter.format(props.input.filePath)}
         </InlineTool>
       </Match>
     </Switch>
@@ -2100,10 +2143,10 @@ function Write(props: ToolProps<typeof WriteTool>) {
 function Glob(props: ToolProps<typeof GlobTool>) {
   const pathFormatter = usePathFormatter()
   return (
-    <InlineTool icon="✱" pending="Finding files..." complete={props.input.pattern} part={props.part}>
-      Glob "{props.input.pattern}" <Show when={props.input.path}>in {pathFormatter.format(props.input.path)} </Show>
+    <InlineTool icon="✱" pending="Buscando archivos..." complete={props.input.pattern} part={props.part}>
+      Glob "{props.input.pattern}" <Show when={props.input.path}>en {pathFormatter.format(props.input.path)} </Show>
       <Show when={props.metadata.count}>
-        ({props.metadata.count} {props.metadata.count === 1 ? "match" : "matches"})
+        ({props.metadata.count} {props.metadata.count === 1 ? "coincidencia" : "coincidencias"})
       </Show>
     </InlineTool>
   )
@@ -2124,18 +2167,18 @@ function Read(props: ToolProps<typeof ReadTool>) {
     <>
       <InlineTool
         icon="→"
-        pending="Reading file..."
+        pending="Leyendo archivo..."
         complete={props.input.filePath}
         spinner={isRunning()}
         part={props.part}
       >
-        Read {pathFormatter.format(props.input.filePath)} {input(props.input, ["filePath"])}
+        Leer {pathFormatter.format(props.input.filePath)} {input(props.input, ["filePath"])}
       </InlineTool>
       <For each={loaded()}>
         {(filepath, index) => (
           <box id={`tool-inline-loaded-${props.part.id}-${index()}`} paddingLeft={3}>
             <text paddingLeft={3} fg={theme.textMuted}>
-              ↳ Loaded {pathFormatter.format(filepath)}
+              ↳ Cargado {pathFormatter.format(filepath)}
             </text>
           </box>
         )}
@@ -2147,10 +2190,10 @@ function Read(props: ToolProps<typeof ReadTool>) {
 function Grep(props: ToolProps<typeof GrepTool>) {
   const pathFormatter = usePathFormatter()
   return (
-    <InlineTool icon="✱" pending="Searching content..." complete={props.input.pattern} part={props.part}>
+    <InlineTool icon="✱" pending="Buscando contenido..." complete={props.input.pattern} part={props.part}>
       Grep "{props.input.pattern}" <Show when={props.input.path}>in {pathFormatter.format(props.input.path)} </Show>
       <Show when={props.metadata.matches}>
-        ({props.metadata.matches} {props.metadata.matches === 1 ? "match" : "matches"})
+        ({props.metadata.matches} {props.metadata.matches === 1 ? "coincidencia" : "coincidencias"})
       </Show>
     </InlineTool>
   )
@@ -2158,7 +2201,7 @@ function Grep(props: ToolProps<typeof GrepTool>) {
 
 function WebFetch(props: ToolProps<typeof WebFetchTool>) {
   return (
-    <InlineTool icon="%" pending="Fetching from the web..." complete={props.input.url} part={props.part}>
+    <InlineTool icon="%" pending="Obteniendo de la web..." complete={props.input.url} part={props.part}>
       WebFetch {props.input.url}
     </InlineTool>
   )
@@ -2167,9 +2210,9 @@ function WebFetch(props: ToolProps<typeof WebFetchTool>) {
 function WebSearch(props: ToolProps<typeof WebSearchTool>) {
   const metadata = () => props.metadata as { numResults?: number; provider?: unknown }
   return (
-    <InlineTool icon="◈" pending="Searching web..." complete={props.input.query} part={props.part}>
+    <InlineTool icon="◈" pending="Buscando en la web..." complete={props.input.query} part={props.part}>
       {webSearchProviderLabel(metadata().provider)} "{props.input.query}"{" "}
-      <Show when={metadata().numResults}>({metadata().numResults} results)</Show>
+      <Show when={metadata().numResults}>({metadata().numResults} resultados)</Show>
     </InlineTool>
   )
 }
@@ -2258,7 +2301,7 @@ function Task(props: ToolProps<typeof TaskTool>) {
           navigate({ type: "session", sessionID: props.metadata.sessionId })
         }
         const status = retry()
-        if (status) void DialogAlert.show(dialog, "Retry Error", status.message)
+        if (status) void DialogAlert.show(dialog, "Error de Reintento", status.message)
       }}
     >
       {content()}
@@ -2267,15 +2310,15 @@ function Task(props: ToolProps<typeof TaskTool>) {
 }
 
 export function formatSubagentToolcalls(count: number) {
-  return `${count} toolcall${count === 1 ? "" : "s"}`
+  return `${count} llamada${count === 1 ? "" : "s"} a herramienta`
 }
 
 export function formatSubagentTitle(agent: string, description: string, background: boolean) {
-  return `${agent} Task${background ? " (background)" : ""} — ${description}`
+  return `${agent} Tarea${background ? " (fondo)" : ""} — ${description}`
 }
 
 export function formatSubagentRetry(attempt: number, message: string) {
-  return `Retrying (attempt ${attempt}) · ${message}`
+  return `Reintentando (intento ${attempt}) · ${message}`
 }
 
 export function formatCompletedSubagentDetail(toolcalls: number, duration: string) {
@@ -2376,10 +2419,10 @@ function ApplyPatch(props: ToolProps<typeof ApplyPatchTool>) {
   }
 
   function title(file: { type: string; relativePath: string; filePath: string; deletions: number }) {
-    if (file.type === "delete") return "# Deleted " + file.relativePath
-    if (file.type === "add") return "# Created " + file.relativePath
-    if (file.type === "move") return "# Moved " + pathFormatter.format(file.filePath) + " → " + file.relativePath
-    return "← Patched " + file.relativePath
+    if (file.type === "delete") return "# Eliminado " + file.relativePath
+    if (file.type === "add") return "# Creado " + file.relativePath
+    if (file.type === "move") return "# Movido " + pathFormatter.format(file.filePath) + " → " + file.relativePath
+    return "← Parcheado " + file.relativePath
   }
 
   return (
@@ -2392,7 +2435,7 @@ function ApplyPatch(props: ToolProps<typeof ApplyPatchTool>) {
                 when={file.type !== "delete"}
                 fallback={
                   <text fg={theme.diffRemoved}>
-                    -{file.deletions} line{file.deletions !== 1 ? "s" : ""}
+                    -{file.deletions} línea{file.deletions !== 1 ? "s" : ""}
                   </text>
                 }
               >
@@ -2404,8 +2447,8 @@ function ApplyPatch(props: ToolProps<typeof ApplyPatchTool>) {
         </For>
       </Match>
       <Match when={true}>
-        <InlineTool icon="%" pending="Preparing patch..." complete={false} part={props.part}>
-          Patch
+        <InlineTool icon="%" pending="Preparando parche..." complete={false} part={props.part}>
+          Parche
         </InlineTool>
       </Match>
     </Switch>
@@ -2416,7 +2459,7 @@ function TodoWrite(props: ToolProps<typeof TodoWriteTool>) {
   return (
     <Switch>
       <Match when={props.metadata.todos?.length}>
-        <BlockTool title="# Todos" part={props.part}>
+        <BlockTool title="# Tareas" part={props.part}>
           <box>
             <For each={props.input.todos ?? []}>
               {(todo) => <TodoItem status={todo.status} content={todo.content} />}
@@ -2425,8 +2468,8 @@ function TodoWrite(props: ToolProps<typeof TodoWriteTool>) {
         </BlockTool>
       </Match>
       <Match when={true}>
-        <InlineTool icon="⚙" pending="Updating todos..." complete={false} part={props.part}>
-          Updating todos...
+        <InlineTool icon="⚙" pending="Actualizando tareas..." complete={false} part={props.part}>
+          Actualizando tareas...
         </InlineTool>
       </Match>
     </Switch>
@@ -2438,14 +2481,14 @@ function Question(props: ToolProps<typeof QuestionTool>) {
   const count = createMemo(() => props.input.questions?.length ?? 0)
 
   function format(answer?: ReadonlyArray<string>) {
-    if (!answer?.length) return "(no answer)"
+    if (!answer?.length) return "(sin respuesta)"
     return answer.join(", ")
   }
 
   return (
     <Switch>
       <Match when={props.metadata.answers}>
-        <BlockTool title="# Questions" part={props.part}>
+        <BlockTool title="# Preguntas" part={props.part}>
           <box gap={1}>
             <For each={props.input.questions ?? []}>
               {(q, i) => (
@@ -2459,8 +2502,8 @@ function Question(props: ToolProps<typeof QuestionTool>) {
         </BlockTool>
       </Match>
       <Match when={true}>
-        <InlineTool icon="→" pending="Asking questions..." complete={count()} part={props.part}>
-          Asked {count()} question{count() !== 1 ? "s" : ""}
+        <InlineTool icon="→" pending="Haciendo preguntas..." complete={count()} part={props.part}>
+          Hechas {count()} pregunta{count() !== 1 ? "s" : ""}
         </InlineTool>
       </Match>
     </Switch>
@@ -2469,8 +2512,8 @@ function Question(props: ToolProps<typeof QuestionTool>) {
 
 function Skill(props: ToolProps<typeof SkillTool>) {
   return (
-    <InlineTool icon="→" pending="Loading skill..." complete={props.input.name} part={props.part}>
-      Skill "{props.input.name}"
+    <InlineTool icon="→" pending="Cargando habilidad..." complete={props.input.name} part={props.part}>
+      Habilidad "{props.input.name}"
     </InlineTool>
   )
 }

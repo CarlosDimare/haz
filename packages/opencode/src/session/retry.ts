@@ -7,8 +7,8 @@ import { isRecord } from "@/util/record"
 
 export type Err = ReturnType<NamedError["toObject"]>
 
-export const GO_UPSELL_MESSAGE = "Free usage exceeded, subscribe to Go"
-export const GO_UPSELL_URL = "https://opencode.ai/go"
+export const GO_UPSELL_MESSAGE = "Uso gratuito excedido, suscribite a Go"
+export const GO_UPSELL_URL = ""
 export type RetryReason = "free_tier_limit" | "account_rate_limit" | (string & {})
 
 export type Retryable = {
@@ -79,8 +79,8 @@ export function retryable(error: Err, provider: string) {
         action: {
           reason: "free_tier_limit",
           provider,
-          title: "Free limit reached",
-          message: "Subscribe to OpenCode Go for reliable access to the best open-source models, starting at $5/month.",
+          title: "Límite gratuito alcanzado",
+          message: "Suscribite a ojito Go para acceso confiable a los mejores modelos open-source, desde $5/mes.",
           label: "subscribe",
           link: GO_UPSELL_URL,
         },
@@ -104,22 +104,22 @@ export function retryable(error: Err, provider: string) {
         return minutes > 0 ? unit(minutes, "minute") : "less than a minute"
       })
 
-      const message = `${limitName ? `${limitName} usage limit` : "Usage limit"} reached. It will reset in ${resetIn}. To continue using this model now, enable usage from your available balance`
+      const message = `${limitName ? `${limitName} límite de uso` : "Límite de uso"} alcanzado. Se reinicia en ${resetIn}. Para seguir usando este modelo ahora, activá el uso desde tu balance disponible`
 
-      const link = `https://opencode.ai/workspace/${workspace}/go`
+      const link = ""
       return {
-        message: `${message} - ${link}`,
+        message,
         action: {
           reason: "account_rate_limit",
           provider,
-          title: "Go limit reached",
+          title: "Límite de Go alcanzado",
           message,
-          label: "open settings",
+          label: "abrir configuración",
           link,
         },
       }
     }
-    return { message: error.data.message.includes("Overloaded") ? "Provider is overloaded" : error.data.message }
+    return { message: error.data.message.includes("Overloaded") ? "El proveedor está sobrecargado" : error.data.message }
   }
 
   // Check for rate limit patterns in plain text error messages
@@ -140,13 +140,13 @@ export function retryable(error: Err, provider: string) {
   const code = typeof json.code === "string" ? json.code : ""
 
   if (json.type === "error" && json.error?.type === "too_many_requests") {
-    return { message: "Too Many Requests" }
+    return { message: "Demasiadas solicitudes" }
   }
   if (code.includes("exhausted") || code.includes("unavailable")) {
-    return { message: "Provider is overloaded" }
+    return { message: "El proveedor está sobrecargado" }
   }
   if (json.type === "error" && typeof json.error?.code === "string" && json.error.code.includes("rate_limit")) {
-    return { message: "Rate Limited" }
+    return { message: "Límite de tasa excedido" }
   }
   return undefined
 }

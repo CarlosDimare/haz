@@ -55,20 +55,20 @@ export function providerOptions(list: { id: string; name: string }[]): ProviderO
         value: provider.id,
         providerID: provider.id,
         description: {
-          opencode: "(Recommended)",
+          opencode: "(Recomendado)",
           anthropic: "(API key)",
-          openai: "(ChatGPT Plus/Pro or API key)",
-          "opencode-go": "Low cost subscription for everyone",
+          openai: "(ChatGPT Plus/Pro o API key)",
+          "opencode-go": "Suscripción barata para todos",
         }[provider.id],
-        category: provider.id in PROVIDER_PRIORITY ? "Popular" : "Providers",
+        category: provider.id in PROVIDER_PRIORITY ? "Populares" : "Proveedores",
       })),
     ),
     {
       type: "custom",
-      title: "Other",
+      title: "Otro",
       value: CUSTOM_PROVIDER_OPTION_VALUE,
-      description: "Custom provider",
-      category: "Providers",
+      description: "Proveedor personalizado",
+      category: "Proveedores",
     },
   ]
 }
@@ -88,11 +88,11 @@ export function createDialogProviderOptions() {
   const onboarded = useConnected()
 
   async function promptCustomProviderID(): Promise<string | undefined> {
-    const value = await DialogPrompt.show(dialog, "Other", {
-      placeholder: "Provider id",
+    const value = await DialogPrompt.show(dialog, "Otro", {
+      placeholder: "ID del proveedor",
       description: () => (
         <text fg={theme.textMuted}>
-          This only stores a credential. Configure the provider in opencode.json to use it.
+          Esto solo guarda una credencial. Configurala en ojito.json para usarla.
         </text>
       ),
     })
@@ -104,7 +104,7 @@ export function createDialogProviderOptions() {
     toast.show({
       variant: "error",
       message:
-        "Provider ids must start with a lowercase letter or number and only use lowercase letters, numbers, hyphens, and underscores",
+        "Los IDs de proveedor deben empezar con minúscula o número y usar solo minúsculas, números, guiones y guiones bajos",
     })
     return promptCustomProviderID()
   }
@@ -153,7 +153,7 @@ export function createDialogProviderOptions() {
                 dialog.replace(
                   () => (
                     <DialogSelect
-                      title="Select auth method"
+                      title="Elegí método de autenticación"
                       options={methods.map((x, index) => ({
                         title: x.label,
                         value: index,
@@ -223,7 +223,7 @@ export function createDialogProviderOptions() {
 
 export function DialogProvider() {
   const options = createDialogProviderOptions()
-  return <DialogSelect title="Connect a provider" options={options()} />
+  return <DialogSelect title="Conectá un proveedor" options={options()} />
 }
 
 interface AutoMethodProps {
@@ -243,13 +243,13 @@ function AutoMethod(props: AutoMethodProps) {
     bindings: [
       {
         key: "c",
-        desc: "Copy provider code",
+        desc: "Copiar código del proveedor",
         group: "Dialog",
         cmd: () => {
           const code =
             props.authorization.instructions.match(/[A-Z0-9]{4}-[A-Z0-9]{4,5}/)?.[0] ?? props.authorization.url
           Clipboard.copy(code)
-            .then(() => toast.show({ message: "Copied to clipboard", variant: "info" }))
+            .then(() => toast.show({ message: "Copiado al portapapeles", variant: "info" }))
             .catch(toast.error)
         },
       },
@@ -266,7 +266,7 @@ function AutoMethod(props: AutoMethodProps) {
         variant: "error",
         message:
           "name" in result.error && result.error.name === "ProviderAuthOauthCallbackFailed"
-            ? "OAuth authorization failed. Try /connect again."
+            ? "Error de autorización OAuth. Probá /connect de nuevo."
             : JSON.stringify(result.error),
       })
       dialog.clear()
@@ -291,9 +291,9 @@ function AutoMethod(props: AutoMethodProps) {
         <Link href={props.authorization.url} fg={theme.primary} />
         <text fg={theme.textMuted}>{props.authorization.instructions}</text>
       </box>
-      <text fg={theme.textMuted}>Waiting for authorization...</text>
+      <text fg={theme.textMuted}>Esperando autorización...</text>
       <text fg={theme.text}>
-        c <span style={{ fg: theme.textMuted }}>copy</span>
+        c <span style={{ fg: theme.textMuted }}>copiar</span>
       </text>
     </box>
   )
@@ -315,7 +315,7 @@ function CodeMethod(props: CodeMethodProps) {
   return (
     <DialogPrompt
       title={props.title}
-      placeholder="Authorization code"
+      placeholder="Código de autorización"
       onConfirm={async (value) => {
         const { error } = await sdk.client.provider.oauth.callback({
           providerID: props.providerID,
@@ -335,7 +335,7 @@ function CodeMethod(props: CodeMethodProps) {
           <text fg={theme.textMuted}>{props.authorization.instructions}</text>
           <Link href={props.authorization.url} fg={theme.primary} />
           <Show when={error()}>
-            <text fg={theme.error}>Invalid code</text>
+            <text fg={theme.error}>Código inválido</text>
           </Show>
         </box>
       )}
@@ -365,22 +365,21 @@ function ApiMethod(props: ApiMethodProps) {
           opencode: (
             <box gap={1}>
               <text fg={theme.textMuted}>
-                OpenCode Zen gives you access to all the best coding models at the cheapest prices with a single API
-                key.
+                ojito Zen te da acceso a los mejores modelos de código a los precios más baratos con una sola API key.
               </text>
               <text fg={theme.text}>
-                Go to <span style={{ fg: theme.primary }}>https://opencode.ai/zen</span> to get a key
+                Andá a <span style={{ fg: theme.primary }}>https://zen.ojito</span> para obtener una key
               </text>
             </box>
           ),
           "opencode-go": (
             <box gap={1}>
               <text fg={theme.textMuted}>
-                OpenCode Go is a $10 per month subscription that provides reliable access to popular open coding models
-                with generous usage limits.
+                ojito Go es una suscripción de $10 por mes que da acceso confiable a modelos de código abierto populares
+                con límites de uso generosos.
               </text>
               <text fg={theme.text}>
-                Go to <span style={{ fg: theme.primary }}>https://opencode.ai/go</span> and enable OpenCode Go
+                Andá a <span style={{ fg: theme.primary }}>https://go.ojito</span> y activá ojito Go
               </text>
             </box>
           ),
@@ -401,7 +400,7 @@ function ApiMethod(props: ApiMethodProps) {
         if (props.custom && !sync.data.provider_next.all.some((provider) => provider.id === props.providerID)) {
           toast.show({
             variant: "info",
-            message: `Saved credential for ${props.providerID}. Configure it in opencode.json to use it.`,
+            message: `Credencial guardada para ${props.providerID}. Configurala en ojito.json para usarla.`,
           })
           dialog.clear()
           return

@@ -131,7 +131,7 @@ export const layer = Layer.effect(
         const agents: Record<string, Info> = {
           build: {
             name: "build",
-            description: "The default agent. Executes tools based on configured permissions.",
+            description: "Agente por defecto. Ejecuta herramientas según los permisos configurados.",
             options: {},
             permission: Permission.merge(
               defaults,
@@ -146,7 +146,7 @@ export const layer = Layer.effect(
           },
           plan: {
             name: "plan",
-            description: "Plan mode. Disallows all edit tools.",
+            description: "Modo plan. No permite herramientas de edición.",
             options: {},
             permission: Permission.merge(
               defaults,
@@ -169,7 +169,7 @@ export const layer = Layer.effect(
           },
           general: {
             name: "general",
-            description: `General-purpose agent for researching complex questions and executing multi-step tasks. Use this agent to execute multiple units of work in parallel.`,
+            description: `Agente de propósito general para investigar preguntas complejas y ejecutar tareas multi-paso. Usá este agente para ejecutar varias unidades de trabajo en paralelo.`,
             permission: Permission.merge(
               defaults,
               Permission.fromConfig({
@@ -198,7 +198,7 @@ export const layer = Layer.effect(
               }),
               user,
             ),
-            description: `Fast agent specialized for exploring codebases. Use this when you need to quickly find files by patterns (eg. "src/components/**/*.tsx"), search code for keywords (eg. "API endpoints"), or answer questions about the codebase (eg. "how do API endpoints work?"). When calling this agent, specify the desired thoroughness level: "quick" for basic searches, "medium" for moderate exploration, or "very thorough" for comprehensive analysis across multiple locations and naming conventions.`,
+            description: `Agente rápido especializado en explorar codebases. Usalo para encontrar archivos por patrón, buscar código por palabras clave, o responder preguntas sobre el código. Niveles de profundidad: "quick" (rápido), "medium" (moderado), "very thorough" (muy exhaustivo).`,
             prompt: PROMPT_EXPLORE,
             options: {},
             mode: "subagent",
@@ -226,7 +226,7 @@ export const layer = Layer.effect(
                     }),
                     user,
                   ),
-                  description: `Docs and dependency-source specialist. Use this when you need to inspect external documentation, clone dependency repositories into the managed cache, and research library implementation details without modifying the user's workspace.`,
+                  description: `Especialista en documentación y dependencias. Inspeccioná documentación externa, cloná repositorios y analizá detalles de implementación sin modificar el workspace del usuario.`,
                   prompt: PROMPT_SCOUT,
                   options: {},
                   mode: "subagent" as const,
@@ -347,13 +347,13 @@ export const layer = Layer.effect(
           const c = yield* config.get()
           if (c.default_agent) {
             const agent = agents[c.default_agent]
-            if (!agent) throw new Error(`default agent "${c.default_agent}" not found`)
-            if (agent.mode === "subagent") throw new Error(`default agent "${c.default_agent}" is a subagent`)
-            if (agent.hidden === true) throw new Error(`default agent "${c.default_agent}" is hidden`)
+            if (!agent) throw new Error(`agente por defecto "${c.default_agent}" no encontrado`)
+            if (agent.mode === "subagent") throw new Error(`el agente por defecto "${c.default_agent}" es un subagente`)
+            if (agent.hidden === true) throw new Error(`el agente por defecto "${c.default_agent}" está oculto`)
             return agent
           }
           const visible = Object.values(agents).find((a) => a.mode !== "subagent" && a.hidden !== true)
-          if (!visible) throw new Error("no primary visible agent found")
+          if (!visible) throw new Error("no se encontró un agente primario visible")
           return visible
         })
 
@@ -423,7 +423,7 @@ export const layer = Layer.effect(
                 )),
             {
               role: "user",
-              content: `Create an agent configuration based on this request: "${input.description}".\n\nIMPORTANT: The following identifiers already exist and must NOT be used: ${existing.map((i) => i.name).join(", ")}\n  Return ONLY the JSON object, no other text, do not wrap in backticks`,
+              content: `Creá una configuración de agente basada en este pedido: "${input.description}".\n\nIMPORTANTE: Estos identificadores ya existen y NO deben usarse: ${existing.map((i) => i.name).join(", ")}\n  Devolvé SOLO el objeto JSON, sin texto extra, sin backticks`,
             },
           ],
           model: language,

@@ -104,7 +104,7 @@ function init() {
     bindings: [
       {
         key: "escape",
-        desc: "Close dialog",
+        desc: "Cerrar diálogo",
         group: "Dialog",
         cmd: () => {
           if (renderer.getSelection()) {
@@ -118,7 +118,7 @@ function init() {
       },
       {
         key: "ctrl+c",
-        desc: "Close dialog",
+        desc: "Cerrar diálogo",
         group: "Dialog",
         cmd: () => {
           if (renderer.getSelection()) {

@@ -529,7 +529,7 @@ function flushPart(data: SessionData, commits: SessionCommit[], partID: string, 
       return
     }
     if (kind === "reasoning" && chunk) {
-      chunk = `Thinking: ${chunk.replace(/\[REDACTED\]/g, "")}`
+      chunk = `Pensando: ${chunk.replace(/\[REDACTED\]/g, "")}`
     }
     if (kind === "assistant" && chunk) {
       chunk = stripEcho(data, msg, chunk)

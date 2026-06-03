@@ -133,8 +133,8 @@ export function QuestionPrompt(props: { request: QuestionRequest }) {
     commands: [
       {
         name: "prompt.clear",
-        title: "Clear answer edit",
-        category: "Question",
+          title: "Limpiar edición de respuesta",
+          category: "Pregunta",
         run() {
           const text = textarea?.plainText ?? ""
           if (!text) {
@@ -148,8 +148,8 @@ export function QuestionPrompt(props: { request: QuestionRequest }) {
     bindings: [
       {
         key: "escape",
-        desc: "Cancel answer edit",
-        group: "Question",
+        desc: "Cancelar edición de respuesta",
+        group: "Pregunta",
         cmd: () => {
           setStore("editing", false)
         },
@@ -157,8 +157,8 @@ export function QuestionPrompt(props: { request: QuestionRequest }) {
       ...tuiConfig.keybinds.get("prompt.clear"),
       {
         key: "return",
-        desc: "Submit answer edit",
-        group: "Question",
+        desc: "Enviar edición de respuesta",
+        group: "Pregunta",
         cmd: () => {
           const text = textarea?.plainText?.trim() ?? ""
           const prev = store.custom[store.tab]
@@ -214,7 +214,7 @@ export function QuestionPrompt(props: { request: QuestionRequest }) {
       commands: [
         {
           name: "app.exit",
-          title: "Reject question",
+          title: "Rechazar pregunta",
           category: "Question",
           run() {
             reject()
@@ -224,37 +224,37 @@ export function QuestionPrompt(props: { request: QuestionRequest }) {
       bindings: [
         {
           key: "left",
-          desc: "Previous question",
-          group: "Question",
+          desc: "Pregunta anterior",
+          group: "Pregunta",
           cmd: () => selectTab((store.tab - 1 + tabs()) % tabs()),
         },
         {
           key: "h",
-          desc: "Previous question",
-          group: "Question",
+          desc: "Pregunta anterior",
+          group: "Pregunta",
           cmd: () => selectTab((store.tab - 1 + tabs()) % tabs()),
         },
-        { key: "right", desc: "Next question", group: "Question", cmd: () => selectTab((store.tab + 1) % tabs()) },
-        { key: "l", desc: "Next question", group: "Question", cmd: () => selectTab((store.tab + 1) % tabs()) },
+        { key: "right", desc: "Siguiente pregunta", group: "Pregunta", cmd: () => selectTab((store.tab + 1) % tabs()) },
+        { key: "l", desc: "Siguiente pregunta", group: "Pregunta", cmd: () => selectTab((store.tab + 1) % tabs()) },
         {
           key: "tab",
-          desc: "Next question",
-          group: "Question",
+          desc: "Siguiente pregunta",
+          group: "Pregunta",
           cmd: ({ event }: { event: { shift: boolean } }) => {
             selectTab((store.tab + (event.shift ? -1 : 1) + tabs()) % tabs())
           },
         },
         ...(confirm()
           ? [
-              { key: "return", desc: "Submit answer", group: "Question", cmd: () => submit() },
-              { key: "escape", desc: "Reject question", group: "Question", cmd: () => reject() },
+              { key: "return", desc: "Enviar respuesta", group: "Pregunta", cmd: () => submit() },
+              { key: "escape", desc: "Rechazar pregunta", group: "Pregunta", cmd: () => reject() },
               ...tuiConfig.keybinds.get("app.exit"),
             ]
           : [
               ...Array.from({ length: max }, (_, index) => ({
                 key: String(index + 1),
-                desc: `Select answer ${index + 1}`,
-                group: "Question",
+                desc: `Seleccionar respuesta ${index + 1}`,
+                group: "Pregunta",
                 cmd: () => {
                   moveTo(index)
                   selectOption()
@@ -262,20 +262,20 @@ export function QuestionPrompt(props: { request: QuestionRequest }) {
               })),
               {
                 key: "up",
-                desc: "Previous answer",
-                group: "Question",
+                desc: "Respuesta anterior",
+                group: "Pregunta",
                 cmd: () => moveTo((store.selected - 1 + total) % total),
               },
               {
                 key: "k",
-                desc: "Previous answer",
-                group: "Question",
+                desc: "Respuesta anterior",
+                group: "Pregunta",
                 cmd: () => moveTo((store.selected - 1 + total) % total),
               },
-              { key: "down", desc: "Next answer", group: "Question", cmd: () => moveTo((store.selected + 1) % total) },
-              { key: "j", desc: "Next answer", group: "Question", cmd: () => moveTo((store.selected + 1) % total) },
-              { key: "return", desc: "Select answer", group: "Question", cmd: () => selectOption() },
-              { key: "escape", desc: "Reject question", group: "Question", cmd: () => reject() },
+              { key: "down", desc: "Siguiente respuesta", group: "Pregunta", cmd: () => moveTo((store.selected + 1) % total) },
+              { key: "j", desc: "Siguiente respuesta", group: "Pregunta", cmd: () => moveTo((store.selected + 1) % total) },
+              { key: "return", desc: "Seleccionar respuesta", group: "Pregunta", cmd: () => selectOption() },
+              { key: "escape", desc: "Rechazar pregunta", group: "Pregunta", cmd: () => reject() },
               ...tuiConfig.keybinds.get("app.exit"),
             ]),
       ],
@@ -411,7 +411,7 @@ export function QuestionPrompt(props: { request: QuestionRequest }) {
                     </box>
                     <box backgroundColor={other() ? theme.backgroundElement : undefined}>
                       <text fg={other() ? theme.secondary : customPicked() ? theme.success : theme.text}>
-                        {multi() ? `[${customPicked() ? "✓" : " "}] Type your own answer` : "Type your own answer"}
+                        {multi() ? `[${customPicked() ? "✓" : " "}] Escribí tu propia respuesta` : "Escribí tu propia respuesta"}
                       </text>
                     </box>
 
@@ -431,7 +431,7 @@ export function QuestionPrompt(props: { request: QuestionRequest }) {
                           })
                         }}
                         initialValue={input()}
-                        placeholder="Type your own answer"
+                        placeholder="Escribí tu propia respuesta"
                         placeholderColor={theme.textMuted}
                         minHeight={1}
                         maxHeight={6}
