@@ -26,9 +26,9 @@
       "created": 1780502625309
     },
     {
-      "id": "01KT77EJ7TSA178DXE9AQEZFKP",
-      "frase": "Agent renamed from \"ojito\" to \"prisma\". Updated in .opencode/opencode.jsonc: default_agent, agent key, prompt text, and description. Product references to \"ojito\" (CLI commands, URLs, theme) kept unchanged as they refer to the opencode project.",
-      "created": 1780506642682
+      "id": "01KT79JJSRR4A37FEJTVH16RVR",
+      "frase": "Agent renamed from \"prisma\" to \"haz\". Updated in .opencode/opencode.jsonc: default_agent, agent key (haz), prompt text (\"Sos haz.\"), and description (\"Haz: múltiples facetas...\"). GitHub repo renamed to CarlosDimare/haz. Remote updated to CarlosDimare/haz.git.",
+      "created": 1780508871481
     }
   ]
 }
