@@ -120,7 +120,7 @@ bot.on("message:text", async (ctx: Context) => {
     sessions.set(key, state)
     userSessions.set(userId, key)
 
-    // Share so it's visible in ojito TUI
+    // Share so it's visible in haz TUI
     const shareResult = await opencode.client.session.share({ path: { id: createResult.data.id } })
     if (!shareResult.error && shareResult.data?.share?.url) {
       await bot.api.sendMessage(chatId, `🔗 ${shareResult.data.share.url}`, {

@@ -17,7 +17,7 @@ export interface Interface {
   readonly system: () => Effect.Effect<string | undefined>
 }
 
-export class Service extends Context.Service<Service, Interface>()("@ojito/Memory") {}
+export class Service extends Context.Service<Service, Interface>()("@haz/Memory") {}
 
 export const layer: Layer.Layer<Service, never, AppFileSystem.Service> = Layer.effect(
   Service,

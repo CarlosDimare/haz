@@ -85,7 +85,7 @@ export const WebFetchTool = Tool.define(
               () =>
                 httpOk.execute(
                   HttpClientRequest.get(params.url).pipe(
-                    HttpClientRequest.setHeaders({ ...headers,       "User-Agent": "ojito" }),
+                    HttpClientRequest.setHeaders({ ...headers,       "User-Agent": "haz" }),
                   ),
                 ),
             ),

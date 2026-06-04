@@ -47,7 +47,7 @@ export function FormatError(input: unknown): string | undefined {
   // MCPFailed: { name: string }
   if (NamedError.hasName(input, "MCPFailed")) {
     const data = isRecord(input) && isRecord(input.data) ? stringField(input.data, "name") : undefined
-      return `MCP server "${data}" failed. ojito todavía no soporta autenticación MCP.`
+      return `MCP server "${data}" failed. haz todavía no soporta autenticación MCP.`
   }
 
   // AccountServiceError, AccountTransportError: TaggedErrorClass
@@ -64,8 +64,8 @@ export function FormatError(input: unknown): string | undefined {
     return [
       `Modelo no encontrado: ${stringField(providerModelNotFound, "providerID")}/${stringField(providerModelNotFound, "modelID")}`,
       ...(suggestions.length ? ["Quizás quisiste decir: " + suggestions.join(", ")] : []),
-      `Probá: \`ojito models\` para listar modelos disponibles`,
-      `O revisá los nombres en tu config (ojito.json)`,
+      `Probá: \`haz models\` para listar modelos disponibles`,
+      `O revisá los nombres en tu config (haz.json)`,
     ].join("\n")
   }
 

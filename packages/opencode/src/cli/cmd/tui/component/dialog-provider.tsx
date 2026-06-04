@@ -92,7 +92,7 @@ export function createDialogProviderOptions() {
       placeholder: "ID del proveedor",
       description: () => (
         <text fg={theme.textMuted}>
-          Esto solo guarda una credencial. Configurala en ojito.json para usarla.
+          Esto solo guarda una credencial. Configurala en haz.json para usarla.
         </text>
       ),
     })
@@ -365,21 +365,18 @@ function ApiMethod(props: ApiMethodProps) {
           opencode: (
             <box gap={1}>
               <text fg={theme.textMuted}>
-                ojito Zen te da acceso a los mejores modelos de código a los precios más baratos con una sola API key.
-              </text>
-              <text fg={theme.text}>
-                Andá a <span style={{ fg: theme.primary }}>https://zen.ojito</span> para obtener una key
+                haz Zen te da acceso a los mejores modelos de código a los precios más baratos con una sola API key.
+
+                  Andá a <span style={{ fg: theme.primary }}>https://zen.haz</span> para obtener una key
               </text>
             </box>
           ),
           "opencode-go": (
             <box gap={1}>
               <text fg={theme.textMuted}>
-                ojito Go es una suscripción de $10 por mes que da acceso confiable a modelos de código abierto populares
-                con límites de uso generosos.
-              </text>
-              <text fg={theme.text}>
-                Andá a <span style={{ fg: theme.primary }}>https://go.ojito</span> y activá ojito Go
+                haz Go es una suscripción de $10 por mes que da acceso confiable a modelos de código abierto populares
+
+                  Andá a <span style={{ fg: theme.primary }}>https://go.haz</span> y activá haz Go
               </text>
             </box>
           ),
@@ -400,7 +397,7 @@ function ApiMethod(props: ApiMethodProps) {
         if (props.custom && !sync.data.provider_next.all.some((provider) => provider.id === props.providerID)) {
           toast.show({
             variant: "info",
-            message: `Credencial guardada para ${props.providerID}. Configurala en ojito.json para usarla.`,
+            message: `Credencial guardada para ${props.providerID}. Configurala en haz.json para usarla.`,
           })
           dialog.clear()
           return

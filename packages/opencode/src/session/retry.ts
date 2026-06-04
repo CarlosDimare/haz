@@ -80,7 +80,7 @@ export function retryable(error: Err, provider: string) {
           reason: "free_tier_limit",
           provider,
           title: "Límite gratuito alcanzado",
-          message: "Suscribite a ojito Go para acceso confiable a los mejores modelos open-source, desde $5/mes.",
+          message: "Suscribite a haz Go para acceso confiable a los mejores modelos open-source, desde $5/mes.",
           label: "subscribe",
           link: GO_UPSELL_URL,
         },

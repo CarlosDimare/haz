@@ -24,7 +24,7 @@ interface RemovalTargets {
 
 export const UninstallCommand = {
   command: "uninstall",
-  describe: "desinstalar ojito y eliminar todos los archivos relacionados",
+  describe: "desinstalar haz y eliminar todos los archivos relacionados",
   builder: (yargs: Argv) =>
     yargs
       .option("keep-config", {

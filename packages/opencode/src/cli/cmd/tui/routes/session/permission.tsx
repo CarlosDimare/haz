@@ -144,11 +144,11 @@ export function PermissionPrompt(props: { request: PermissionRequest }) {
           body={
             <Switch>
               <Match when={props.request.always.length === 1 && props.request.always[0] === "*"}>
-                <TextBody title={"Esto permitirá " + props.request.permission + " hasta que se reinicie ojito."} />
+                <TextBody title={"Esto permitirá " + props.request.permission + " hasta que se reinicie haz."} />
               </Match>
               <Match when={true}>
                 <box paddingLeft={1} gap={1}>
-                  <text fg={theme.textMuted}>Esto permitirá los siguientes patrones hasta que se reinicie ojito</text>
+                  <text fg={theme.textMuted}>Esto permitirá los siguientes patrones hasta que se reinicie haz</text>
                   <box>
                     <For each={props.request.always}>
                       {(pattern) => (
@@ -484,7 +484,7 @@ function RejectPrompt(props: { onConfirm: (message: string) => void; onCancel: (
           <text fg={theme.text}>Rechazar permiso</text>
         </box>
         <box paddingLeft={1}>
-          <text fg={theme.textMuted}>Decile a ojito qué hacer diferente</text>
+          <text fg={theme.textMuted}>Decile a haz qué hacer diferente</text>
         </box>
       </box>
       <box

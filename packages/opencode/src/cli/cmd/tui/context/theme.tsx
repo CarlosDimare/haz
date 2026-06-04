@@ -24,7 +24,7 @@ import nightowl from "./theme/nightowl.json" with { type: "json" }
 import nord from "./theme/nord.json" with { type: "json" }
 import osakaJade from "./theme/osaka-jade.json" with { type: "json" }
 import onedark from "./theme/one-dark.json" with { type: "json" }
-import ojito from "./theme/opencode.json" with { type: "json" }
+import haz from "./theme/opencode.json" with { type: "json" }
 import orng from "./theme/orng.json" with { type: "json" }
 import lucentOrng from "./theme/lucent-orng.json" with { type: "json" }
 import palenight from "./theme/palenight.json" with { type: "json" }
@@ -108,7 +108,7 @@ export const DEFAULT_THEMES: Record<string, ThemeJson> = {
   nord,
   ["one-dark"]: onedark,
   ["osaka-jade"]: osakaJade,
-  ojito,
+  haz,
   orng,
   ["lucent-orng"]: lucentOrng,
   palenight,
@@ -156,7 +156,7 @@ const [store, setStore] = createStore<State>({
   themes: listThemes(),
   mode: "dark",
   lock: undefined,
-  active: "ojito",
+  active: "haz",
   ready: false,
 })
 
@@ -321,8 +321,8 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
         }
         draft.mode = mode
         draft.lock = lock
-        const active = config.theme ?? kv.get("theme", "ojito")
-        draft.active = typeof active === "string" ? active : "ojito"
+        const active = config.theme ?? kv.get("theme", "haz")
+        draft.active = typeof active === "string" ? active : "haz"
         draft.ready = false
       }),
     )
@@ -341,7 +341,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
             syncThemes()
           })
           .catch(() => {
-            setStore("active", "ojito")
+            setStore("active", "haz")
           }),
       ]).finally(() => {
         setStore("ready", true)
@@ -360,7 +360,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
             systemTheme = undefined
             syncThemes()
             if (store.active === "system") {
-              setStore("active", "ojito")
+              setStore("active", "haz")
             }
             return
           }
@@ -371,7 +371,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
           systemTheme = undefined
           syncThemes()
           if (store.active === "system") {
-            setStore("active", "ojito")
+            setStore("active", "haz")
           }
         })
     }
@@ -429,7 +429,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
         }
       }
 
-      return resolveTheme(store.themes.ojito, store.mode)
+      return resolveTheme(store.themes.haz, store.mode)
     })
 
     createEffect(() => {

@@ -63,6 +63,7 @@ import { DialogTimeline } from "./dialog-timeline"
 import { DialogForkFromTimeline } from "./dialog-fork-from-timeline"
 import { DialogSessionRename } from "../../component/dialog-session-rename"
 import { Sidebar } from "./sidebar"
+import { ProjectPanel } from "@tui/component/project-panel"
 import { SubagentFooter } from "./subagent-footer.tsx"
 import { LANGUAGE_EXTENSIONS } from "@/lsp/language"
 import parsers from "../../../../../../parsers-config.ts"
@@ -222,6 +223,8 @@ export function Session() {
   const dimensions = useTerminalDimensions()
   const [sidebar, setSidebar] = kv.signal<"auto" | "hide">("sidebar", "auto")
   const [sidebarOpen, setSidebarOpen] = createSignal(true)
+  const [projectPanel, setProjectPanel] = kv.signal<"auto" | "hide">("project_panel", "auto")
+  const [projectPanelOpen, setProjectPanelOpen] = createSignal(false)
   const [conceal, setConceal] = createSignal(true)
   const thinking = useThinkingMode()
   const thinkingMode = thinking.mode
@@ -241,8 +244,13 @@ export function Session() {
     if (sidebar() === "auto" && wide()) return true
     return false
   })
+  const projectPanelVisible = createMemo(() => {
+    if (projectPanelOpen()) return true
+    if (projectPanel() === "auto" && wide()) return true
+    return false
+  })
   const showTimestamps = createMemo(() => timestamps() === "show")
-  const contentWidth = createMemo(() => dimensions().width - (sidebarVisible() ? 42 : 0) - 4)
+  const contentWidth = createMemo(() => dimensions().width - (projectPanelVisible() ? 44 : 0) - (sidebarVisible() ? 42 : 0) - 4)
   const providers = createMemo(() => Model.index(sync.data.provider))
 
   const scrollAcceleration = createMemo(() => getScrollAcceleration(tuiConfig))
@@ -1135,6 +1143,49 @@ export function Session() {
         }}
       >
         <box flexDirection="row" flexGrow={1} minHeight={0}>
+          <Show when={projectPanelVisible()}>
+            <Switch>
+              <Match when={wide()}>
+                <ProjectPanel
+                  onClose={() => {
+                    const isVisible = projectPanelVisible()
+                    batch(() => {
+                      setProjectPanel(() => (isVisible ? "hide" : "auto"))
+                      setProjectPanelOpen(!isVisible)
+                    })
+                  }}
+                />
+              </Match>
+              <Match when={!wide()}>
+                <box
+                  position="absolute"
+                  top={0}
+                  left={0}
+                  right={0}
+                  bottom={0}
+                  backgroundColor={RGBA.fromInts(0, 0, 0, 70)}
+                  onMouseDown={() => {
+                    const isVisible = projectPanelVisible()
+                    batch(() => {
+                      setProjectPanel(() => (isVisible ? "hide" : "auto"))
+                      setProjectPanelOpen(!isVisible)
+                    })
+                  }}
+                >
+                  <ProjectPanel
+                    overlay
+                    onClose={() => {
+                      const isVisible = projectPanelVisible()
+                      batch(() => {
+                        setProjectPanel(() => (isVisible ? "hide" : "auto"))
+                        setProjectPanelOpen(!isVisible)
+                      })
+                    }}
+                  />
+                </box>
+              </Match>
+            </Switch>
+          </Show>
           <box flexGrow={1} minHeight={0} paddingBottom={1} paddingLeft={2} paddingRight={2} gap={1}>
             <Show when={session()}>
               <scrollbox
@@ -1281,18 +1332,30 @@ export function Session() {
                       sessionID={route.sessionID}
                       right={
                         <>
-                          <text
-                            fg={theme.textMuted}
-                            onMouseDown={() => {
-                              const isVisible = sidebarVisible()
-                              batch(() => {
-                                setSidebar(() => (isVisible ? "hide" : "auto"))
-                                setSidebarOpen(!isVisible)
-                              })
-                            }}
-                          >
-                            ☰
-                          </text>
+                           <text
+                              fg={theme.primary}
+                              onMouseDown={() => {
+                                const isVisible = projectPanelVisible()
+                                batch(() => {
+                                  setProjectPanel(() => (isVisible ? "hide" : "auto"))
+                                  setProjectPanelOpen(!isVisible)
+                                })
+                              }}
+                            >
+                              ⊞
+                            </text>
+                            <text
+                              fg={theme.textMuted}
+                              onMouseDown={() => {
+                                const isVisible = sidebarVisible()
+                                batch(() => {
+                                  setSidebar(() => (isVisible ? "hide" : "auto"))
+                                  setSidebarOpen(!isVisible)
+                                })
+                              }}
+                            >
+                              ☰
+                            </text>
                           <TuiPluginRuntime.Slot name="session_prompt_right" session_id={route.sessionID} />
                         </>
                       }

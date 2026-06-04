@@ -456,24 +456,23 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
     if (!terminalTitleEnabled() || Flag.OPENCODE_DISABLE_TERMINAL_TITLE) return
 
     if (route.data.type === "home") {
-      renderer.setTerminalTitle("ojito")
-      return
+      renderer.setTerminalTitle("haz")
     }
 
     if (route.data.type === "session") {
       const session = sync.session.get(route.data.sessionID)
-      if (!session || SessionApi.isDefaultTitle(session.title)) {
-        renderer.setTerminalTitle("ojito")
+      if (!session) {
+        renderer.setTerminalTitle("haz")
         return
       }
 
       const title = session.title.length > 40 ? session.title.slice(0, 37) + "..." : session.title
-      renderer.setTerminalTitle(`ojito | ${title}`)
+      renderer.setTerminalTitle(`haz | ${title}`)
       return
     }
 
     if (route.data.type === "plugin") {
-      renderer.setTerminalTitle(`ojito | ${route.data.id}`)
+      renderer.setTerminalTitle(`haz | ${route.data.id}`)
     }
   })
 
@@ -1045,7 +1044,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
     await DialogAlert.show(
       dialog,
       "Actualización completa",
-      `Actualizado correctamente a ojito v${result.data.version}. Reiniciá la aplicación.`,
+      `Actualizado correctamente a haz v${result.data.version}. Reiniciá la aplicación.`,
     )
 
     void exit()

@@ -26,9 +26,54 @@
       "created": 1780502625309
     },
     {
-      "id": "01KT79JJSRR4A37FEJTVH16RVR",
-      "frase": "Agent renamed from \"prisma\" to \"haz\". Updated in .opencode/opencode.jsonc: default_agent, agent key (haz), prompt text (\"Sos haz.\"), and description (\"Haz: múltiples facetas...\"). GitHub repo renamed to CarlosDimare/haz. Remote updated to CarlosDimare/haz.git.",
-      "created": 1780508871481
+      "id": "01KT7B642GV7EVJDHJX2ATTP4Q",
+      "frase": "Complete rename from \"ojito\" to \"haz\" across the codebase: terminal title, User-Agent, service identifiers (@haz/Memory, @haz/SystemPrompt), theme name, all CLI command references (haz run, haz serve, haz upgrade, etc.), config file references (haz.json, ~/.config/haz/), error messages, tips, product names (haz Zen, haz Go), splash screen, and uninstall text. Only Prisma ORM references in lsp/server.ts left untouched (unrelated database tool). Banner in logo.ts replaced with cleaner 5-line HAZ ASCII art (█/space, 20 chars wide).",
+      "created": 1780510560336
+    },
+    {
+      "id": "01KT7FPE3439NVFX318DPQV0KC",
+      "frase": "Created ProjectPanel component (left sidebar) with project/subagent/circuit management. Files: component/project-panel.tsx (interactive UI with expand/collapse, inline editing via dialogs, cron config, agent enable/disable, circuit connections with visual arrows), util/projects-storage.ts (types for Project/SubAgent/Circuit + JSON persistence to .haz/projects.json). Integrated into session/index.tsx layout with ⊞ toggle button next to prompt, overlay for narrow screens. Data persisted locally with 500ms debounced auto-save.",
+      "created": 1780515289188
+    },
+    {
+      "id": "01KT7G8CHFCN0F49J6MBSK6Q12",
+      "frase": "Fixed three issues in project-panel.tsx: (1) Added stopPropagation on ProjectPanel root box so clicks inside (like [+]) don't close the panel overlay. (2) Replaced raw cron expression input with intuitive two-mode dialog: presets (Manual, cada 5m/30m/hora/día) or custom expression. (3) Eliminated the `description` function issue in DialogPrompt that caused the cron dialog to hang.",
+      "created": 1780515877423
+    },
+    {
+      "id": "01KT7GMMVEJQA028D3SSTQGJE7",
+      "frase": "Replaced circuit link dialog (DialogPrompt typing) with two-step DialogSelect for source/target agent selection in LinkDialog component. Added circuit help text explaining the sequential flow. Added ▶ Ejecutar ahora button for manual-cron agents + lastRun timestamp display. Added lastRun?: number to SubAgent type.",
+      "created": 1780516279150
+    },
+    {
+      "id": "01KT7H5T0EXGQ38EMKBHK1AQTY",
+      "frase": "Changed all dialog-triggering handlers from onMouseDown to onMouseUp so dialogs don't close on mouseup (click opens dialog after mouse release, avoiding overlay mouseup conflict). Added SubAgentLog type (timestamp, level, message) and log[] to SubAgent with collapsible view in agent detail (▾ historial N). handleRunAgent simulates step-by-step execution, adding log entries per task line with coloring (info=dim, result=green, error=red), auto-expands log panel. Persisted in .haz/projects.json.",
+      "created": 1780516841486
+    },
+    {
+      "id": "01KT7HWJ1TVVCJ0A597HS9TP0D",
+      "frase": "Improved agent execution log: handleRunAgent now generates meaningful results via simulateResult() based on task keywords (noticias→ESPN/Olé snippets, analisis→métricas, scrap→estadísticas, etc.). Log entries are expandable: click on ▸ entry to show full detail text below. detail field added to SubAgentLog. expandedEntries Set<string> tracks open entries per agent.",
+      "created": 1780517587002
+    },
+    {
+      "id": "01KT7JG76CM62Y8R7XCRN39421",
+      "frase": "All dialog-triggering handlers changed from onMouseDown to onMouseUp to prevent dialogs from closing on mouse release. Affects CronDialog, LinkDialog, FileEditorDialog, rename prompts, delete confirmations, and all [+]/✕/▶ buttons.",
+      "created": 1780518231244
+    },
+    {
+      "id": "01KT7JG7NBB0F609CC5VYQSXE9",
+      "frase": "Added maximize/restore toggle for ProjectPanel: □ button in header, isMaximized/onToggleMaximize props, dynamic width prop. ProjectPanel default width 44, expandable via toggle.",
+      "created": 1780518231723
+    },
+    {
+      "id": "01KT7JG8BDHBYA915N4CAV85SE",
+      "frase": "Created FileEditorDialog in project-panel.tsx: modal with textarea for editing file content. Files per project stored in ProjectFile[] (path/content/agentId). Auto-generated output/{agent}_{timestamp}.md on each agent execution with task results.",
+      "created": 1780518232429
+    },
+    {
+      "id": "01KT7WZKC07YDDVEKBZZVVR39M",
+      "frase": "Fixed handleRunAgent in project-panel.tsx: (1) replaced simulateResult() with real agent model calls via SDK (session.create + session.prompt), (2) session.create needs directory + agent params (not just title), (3) SDK response is wrapped in { data, request, response } even with throwOnError: true — must access response.data, (4) each task executes sequentially in same session for context, (5) incremental withSave after each task for live log updates",
+      "created": 1780529220992
     }
   ]
 }
