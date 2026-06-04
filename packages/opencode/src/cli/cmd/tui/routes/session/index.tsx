@@ -225,6 +225,7 @@ export function Session() {
   const [sidebarOpen, setSidebarOpen] = createSignal(true)
   const [projectPanel, setProjectPanel] = kv.signal<"auto" | "hide">("project_panel", "auto")
   const [projectPanelOpen, setProjectPanelOpen] = createSignal(false)
+  const [projectPanelMaximized, setProjectPanelMaximized] = createSignal(false)
   const [conceal, setConceal] = createSignal(true)
   const thinking = useThinkingMode()
   const thinkingMode = thinking.mode
@@ -250,7 +251,16 @@ export function Session() {
     return false
   })
   const showTimestamps = createMemo(() => timestamps() === "show")
-  const contentWidth = createMemo(() => dimensions().width - (projectPanelVisible() ? 44 : 0) - (sidebarVisible() ? 42 : 0) - 4)
+  const projectPanelWidth = createMemo(() => {
+    if (!projectPanelVisible()) return 0
+    if (projectPanelMaximized()) return Math.floor(dimensions().width * 0.65)
+    return 44
+  })
+  const contentWidth = createMemo(() => {
+    const w = dimensions().width - projectPanelWidth() - 4
+    // Leave room for sidebar even when maximized, or hide it if too tight
+    return w - (sidebarVisible() && !projectPanelMaximized() ? 42 : 0)
+  })
   const providers = createMemo(() => Model.index(sync.data.provider))
 
   const scrollAcceleration = createMemo(() => getScrollAcceleration(tuiConfig))
@@ -1147,6 +1157,9 @@ export function Session() {
             <Switch>
               <Match when={wide()}>
                 <ProjectPanel
+                  width={projectPanelWidth() || undefined}
+                  isMaximized={projectPanelMaximized()}
+                  onToggleMaximize={() => setProjectPanelMaximized((v) => !v)}
                   onClose={() => {
                     const isVisible = projectPanelVisible()
                     batch(() => {
@@ -1174,6 +1187,9 @@ export function Session() {
                 >
                   <ProjectPanel
                     overlay
+                    width={projectPanelWidth() || undefined}
+                    isMaximized={projectPanelMaximized()}
+                    onToggleMaximize={() => setProjectPanelMaximized((v) => !v)}
                     onClose={() => {
                       const isVisible = projectPanelVisible()
                       batch(() => {

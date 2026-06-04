@@ -1,102 +1,103 @@
 {
   "projects": [
     {
-      "id": "p1780576316076",
-      "name": "protestas",
+      "id": "p1780588331283",
+      "name": "p1",
       "subAgents": [
         {
-          "id": "p1780576316077",
-          "name": "buscaprotesta",
-          "tasks": "busca noticias con fecha del dia actual que mencionen una protesta en curso o programada para el dia actual, protesta puede ser un paro, huelga, movilizacion, marcha, etc. todo en argentina. devuelve una lista ordenada breve con todas las que encuentres",
+          "id": "p1780588331284",
+          "name": "a1",
+          "tasks": "busca 3 noticias de messi de hoy",
           "cron": "",
           "enabled": true,
           "color": "#f0a030",
           "log": [
             {
-              "timestamp": 1780578016339,
+              "timestamp": 1780588530244,
               "level": "info",
-              "message": "▶ Ejecutando..."
+              "message": "▶ a1 (1 tareas)",
+              "detail": "▶ a1 (1 tareas)"
             },
             {
-              "timestamp": 1780578017325,
-              "level": "info",
-              "message": "  busca noticias con fecha del dia actual que mencionen una pr"
-            },
-            {
-              "timestamp": 1780578051933,
+              "timestamp": 1780588550598,
               "level": "result",
-              "message": "Acá tenés la lista ordenada de protestas en Argentina para hoy **jueves 4 de junio de 2026**:\n\n---\n\n",
-              "detail": "Acá tenés la lista ordenada de protestas en Argentina para hoy **jueves 4 de junio de 2026**:\n\n---\n\n### 🔴 En curso / ocurriendo hoy\n\n**1. Paro nacional universitario de 48hs (2do día)**\n- **Qué**: Sin clases ni actividades en universidades nacionales de todo el país. Incluye movilizaciones, clases públicas y asambleas.\n- **Convocan**: FEDUN (docentes) y FATUN (nodocentes).\n- **Reclamo**: Aplicación de la Ley de Financiamiento Universitario, apertura de paritarias, recomposición salarial (52% de pérdida de poder adquisitivo).\n- **Detalle**: El Gobierno ofreció 21% de aumento si los rectores retiraban la demanda judicial. Los gremios rechazaron.\n\n**2. Paro provincial docente en Tierra del Fuego (2do día)**\n- **Qué**: Paro de 48hs en toda la provincia. Concentraciones a las 11:00.\n- **Convocan**: SUTEF.\n- **Puntos**: Ushuaia (Escuela N°1), Río Grande (ex Fiori en Elcano y Lasserre), Tolhuin (Plaza Cívica).\n- **Reclamo**: Rechazo a la última propuesta salarial del gobierno provincial.\n\n**3. Marcha Ni Una Menos** (ayer 3J, con repercusiones y movilizaciones que continúan hoy)\n- **Qué**: Multitudinaria movilización feminista en todo el país (CABA, Córdoba, Rosario, Tucumán, Mar del Plata, Neuquén, etc.).\n- **Motivo**: 11° aniversario del movimiento, con eje en los femicidios de Agostina Vega (14 años, Córdoba), Dulce Candia (17, Misiones) y Noelia Romero (30, Temperley).\n- **Consigna**: \"Vivas, libres y desendeudadas nos queremos\".\n- **Extensión**: En Tucumán marcharon hoy 4 de junio. En CABA, después del Congreso, una columna del PJ marchó hacia el domicilio de Cristina Kirchner en Constitución.\n\n---\n\n### 🟡 Planificadas / anunciadas\n\n**4. Paro docente nacional (CGT) — post 19 de julio**\n- **Qué**: Paro nacional docente en planificación.\n- **Convocan**: UDA, CTERA y otros gremios educativos de la CGT.\n- **Reclamo**: Salario mínimo docente (estancado en $500 mil hace un año, bajo la línea de pobreza).\n- **Cuándo**: Después del 19 de julio (final del Mundial de fútbol).\n\n**5. Plenario nacional gremial universitario — mañana 5 de junio**\n- **Qué**: Reunión de gremios docentes universitarios para definir continuidad del plan de lucha.\n- **Posible medida**: Paro por tiempo indeterminado a partir del segundo cuatrimestre."
+              "message": "Acá van 3 noticias de Messi de los últimos días (hoy es 4 de junio de 2026):\n\n1. **Premio Princesa de Asturias de los Deportes 2026** — Messi recibió el galardón, reconocido como \"el futbolista más ex",
+              "detail": "Acá van 3 noticias de Messi de los últimos días (hoy es 4 de junio de 2026):\n\n1. **Premio Princesa de Asturias de los Deportes 2026** — Messi recibió el galardón, reconocido como \"el futbolista más exitoso de todos los tiempos\". Anto Roccuzzo celebró el premio en redes.\n\n2. **Messi ya entrena con la selección en Kansas** — Se sumó al plantel argentino después de una sobrecarga muscular en el isquiotibial izquierdo que lo preocupó. Ya hace trabajos con el grupo de cara al Mundial 2026. Comparte habitación solo (detalle que se filtró del hotel).\n\n3. **Argentina busca el bicampeonato mundial** — El equipo arranca la defensa del título de Qatar 2022. Messi rompería el récord de mundiales jugados (6ta participación). El debut es contra Argelia, luego Austria y Jordania en fase de grupos."
             },
             {
-              "timestamp": 1780578051944,
+              "timestamp": 1780588580019,
               "level": "result",
-              "message": "✓ Tareas finalizadas. Archivo generado: output/buscaprotesta_1780578051943.md"
+              "message": "✓ 20355ms"
             }
           ],
-          "lastRun": 1780578051944
+          "lastRun": 1780588580019
         },
         {
-          "id": "p1780576316078",
-          "name": "editor",
-          "tasks": "cuando el agente buscaprotestas termine, crea un html con una tabla linda para mostrar la informacion encontrada",
+          "id": "p1780588331285",
+          "name": "a2",
+          "tasks": "crea un html con las noticias encontradas por a1",
           "cron": "",
           "enabled": true,
           "color": "#50c878",
           "log": [
             {
-              "timestamp": 1780578092581,
+              "timestamp": 1780588562987,
               "level": "info",
-              "message": "▶ Ejecutando..."
+              "message": "▶ a2 (1 tareas)",
+              "detail": "▶ a2 (1 tareas)"
             },
             {
-              "timestamp": 1780578093119,
+              "timestamp": 1780588562995,
               "level": "info",
-              "message": "  cuando el agente buscaprotestas termine, crea un html con un"
+              "message": "  Contexto de 1 antecesor(es)",
+              "detail": "  Contexto de 1 antecesor(es)"
             },
             {
-              "timestamp": 1780578099957,
+              "timestamp": 1780588580001,
               "level": "result",
-              "message": "No tengo contexto del agente \"buscaprotestas\" — no está corriendo ni hay resultados de búsqueda prev",
-              "detail": "No tengo contexto del agente \"buscaprotestas\" — no está corriendo ni hay resultados de búsqueda previos. ¿De qué se trata? ¿Ya lo ejecutaste por fuera o querés que lo busquemos/ejecutemos primero?\n\nDecime:\n- ¿Qué información encontró/va a encontrar buscaprotestas?\n- ¿Dónde están los datos (un JSON, archivo, etc.)?\n- ¿Qué columnas/campos debe tener la tabla?\n\nAsí te hago el HTML con los datos reales de una."
+              "message": "Listo, creé `noticias-messi.html` con las 3 noticias que encontró `a1`. Estilo dark, con badges, hover en las cards, y toda la data real de las noticias. Podés abrirlo en el navegador directo.",
+              "detail": "Listo, creé `noticias-messi.html` con las 3 noticias que encontró `a1`. Estilo dark, con badges, hover en las cards, y toda la data real de las noticias. Podés abrirlo en el navegador directo."
             },
             {
-              "timestamp": 1780578099976,
+              "timestamp": 1780588580025,
               "level": "result",
-              "message": "✓ Tareas finalizadas. Archivo generado: output/editor_1780578099975.md"
+              "message": "✓ 17014ms"
             }
           ],
-          "lastRun": 1780578099976
+          "lastRun": 1780588580025
         }
       ],
       "circuits": [
         {
-          "id": "p1780576316079",
-          "name": "sii",
+          "id": "p1780588331286",
+          "name": "c1",
           "connections": [
             {
-              "from": "p1780576316077",
-              "to": "p1780576316078"
+              "from": "p1780588331284",
+              "to": "p1780588331285"
             }
-          ]
+          ],
+          "cron": "",
+          "mode": "pipeline",
+          "maxLoops": 3
         }
       ],
       "files": [
         {
-          "path": "output/buscaprotesta_1780578051943.md",
-          "content": "# buscaprotesta — 4/6/2026, 10:00:51\n\n## Tareas ejecutadas\n\nbusca noticias con fecha del dia actual que mencionen una protesta en curso o programada para el dia actual, protesta puede ser un paro, huelga, movilizacion, marcha, etc. todo en argentina. devuelve una lista ordenada breve con todas las que encuentres\n\n## Resultados\n\n### busca noticias con fecha del dia actual que mencionen una protesta en curso o programada para el dia actual, protesta puede ser un paro, huelga, movilizacion, marcha, etc. todo en argentina. devuelve una lista ordenada breve con todas las que encuentres\n\nAcá tenés la lista ordenada de protestas en Argentina para hoy **jueves 4 de junio de 2026**:\n\n---\n\n### 🔴 En curso / ocurriendo hoy\n\n**1. Paro nacional universitario de 48hs (2do día)**\n- **Qué**: Sin clases ni actividades en universidades nacionales de todo el país. Incluye movilizaciones, clases públicas y asambleas.\n- **Convocan**: FEDUN (docentes) y FATUN (nodocentes).\n- **Reclamo**: Aplicación de la Ley de Financiamiento Universitario, apertura de paritarias, recomposición salarial (52% de pérdida de poder adquisitivo).\n- **Detalle**: El Gobierno ofreció 21% de aumento si los rectores retiraban la demanda judicial. Los gremios rechazaron.\n\n**2. Paro provincial docente en Tierra del Fuego (2do día)**\n- **Qué**: Paro de 48hs en toda la provincia. Concentraciones a las 11:00.\n- **Convocan**: SUTEF.\n- **Puntos**: Ushuaia (Escuela N°1), Río Grande (ex Fiori en Elcano y Lasserre), Tolhuin (Plaza Cívica).\n- **Reclamo**: Rechazo a la última propuesta salarial del gobierno provincial.\n\n**3. Marcha Ni Una Menos** (ayer 3J, con repercusiones y movilizaciones que continúan hoy)\n- **Qué**: Multitudinaria movilización feminista en todo el país (CABA, Córdoba, Rosario, Tucumán, Mar del Plata, Neuquén, etc.).\n- **Motivo**: 11° aniversario del movimiento, con eje en los femicidios de Agostina Vega (14 años, Córdoba), Dulce Candia (17, Misiones) y Noelia Romero (30, Temperley).\n- **Consigna**: \"Vivas, libres y desendeudadas nos queremos\".\n- **Extensión**: En Tucumán marcharon hoy 4 de junio. En CABA, después del Congreso, una columna del PJ marchó hacia el domicilio de Cristina Kirchner en Constitución.\n\n---\n\n### 🟡 Planificadas / anunciadas\n\n**4. Paro docente nacional (CGT) — post 19 de julio**\n- **Qué**: Paro nacional docente en planificación.\n- **Convocan**: UDA, CTERA y otros gremios educativos de la CGT.\n- **Reclamo**: Salario mínimo docente (estancado en $500 mil hace un año, bajo la línea de pobreza).\n- **Cuándo**: Después del 19 de julio (final del Mundial de fútbol).\n\n**5. Plenario nacional gremial universitario — mañana 5 de junio**\n- **Qué**: Reunión de gremios docentes universitarios para definir continuidad del plan de lucha.\n- **Posible medida**: Paro por tiempo indeterminado a partir del segundo cuatrimestre.\n\n---\n\n*Generado automáticamente por haz.*",
-          "updatedAt": 1780578051944,
-          "agentId": "p1780576316077"
+          "path": "output/a1_1780588550604.md",
+          "content": "# a1\n\n## Tareas\n\nbusca 3 noticias de messi de hoy\n\n## Resultado\n\nAcá van 3 noticias de Messi de los últimos días (hoy es 4 de junio de 2026):\n\n1. **Premio Princesa de Asturias de los Deportes 2026** — Messi recibió el galardón, reconocido como \"el futbolista más exitoso de todos los tiempos\". Anto Roccuzzo celebró el premio en redes.\n\n2. **Messi ya entrena con la selección en Kansas** — Se sumó al plantel argentino después de una sobrecarga muscular en el isquiotibial izquierdo que lo preocupó. Ya hace trabajos con el grupo de cara al Mundial 2026. Comparte habitación solo (detalle que se filtró del hotel).\n\n3. **Argentina busca el bicampeonato mundial** — El equipo arranca la defensa del título de Qatar 2022. Messi rompería el récord de mundiales jugados (6ta participación). El debut es contra Argelia, luego Austria y Jordania en fase de grupos.\n\n---\n*Generado automáticamente por haz.*",
+          "updatedAt": 1780588580009,
+          "agentId": "p1780588331284"
         },
         {
-          "path": "output/editor_1780578099975.md",
-          "content": "# editor — 4/6/2026, 10:01:39\n\n## Tareas ejecutadas\n\ncuando el agente buscaprotestas termine, crea un html con una tabla linda para mostrar la informacion encontrada\n\n## Resultados\n\n### cuando el agente buscaprotestas termine, crea un html con una tabla linda para mostrar la informacion encontrada\n\nNo tengo contexto del agente \"buscaprotestas\" — no está corriendo ni hay resultados de búsqueda previos. ¿De qué se trata? ¿Ya lo ejecutaste por fuera o querés que lo busquemos/ejecutemos primero?\n\nDecime:\n- ¿Qué información encontró/va a encontrar buscaprotestas?\n- ¿Dónde están los datos (un JSON, archivo, etc.)?\n- ¿Qué columnas/campos debe tener la tabla?\n\nAsí te hago el HTML con los datos reales de una.\n\n---\n\n*Generado automáticamente por haz.*",
-          "updatedAt": 1780578099976,
-          "agentId": "p1780576316078"
+          "path": "output/a2_1780588580008.md",
+          "content": "# a2\n\n## Tareas\n\ncrea un html con las noticias encontradas por a1\n\n## Resultado\n\nListo, creé `noticias-messi.html` con las 3 noticias que encontró `a1`. Estilo dark, con badges, hover en las cards, y toda la data real de las noticias. Podés abrirlo en el navegador directo.\n\n---\n*Generado automáticamente por haz.*",
+          "updatedAt": 1780588580009,
+          "agentId": "p1780588331285"
         }
       ],
-      "createdAt": 1780577893131,
-      "updatedAt": 1780578099976
+      "createdAt": 1780588375974,
+      "updatedAt": 1780588580025
     }
   ]
 }

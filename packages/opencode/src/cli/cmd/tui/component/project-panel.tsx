@@ -84,10 +84,12 @@ export function ProjectPanel(props: {
 
   function getDir(): string | undefined {
     try {
-      return (project as any).instance?.path?.()?.directory ?? (project as any).data?.instance?.path?.directory
+      const dir = (project as any).instance?.path?.()?.directory ?? (project as any).data?.instance?.path?.directory
+      if (dir) return dir
     } catch {
-      return undefined
+      // fall through
     }
+    return sdk.directory
   }
 
   function scheduleSave(list: Project[]) {
@@ -105,6 +107,13 @@ export function ProjectPanel(props: {
       return next
     })
   }
+
+  onMount(async () => {
+    const dir = getDir()
+    if (!dir) return
+    const list = await loadProjects(dir)
+    if (list.length > 0) setProjects(list)
+  })
 
   onCleanup(() => clearTimeout(saveTimer))
 

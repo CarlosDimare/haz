@@ -74,6 +74,11 @@
       "id": "01KT7WZKC07YDDVEKBZZVVR39M",
       "frase": "Fixed handleRunAgent in project-panel.tsx: (1) replaced simulateResult() with real agent model calls via SDK (session.create + session.prompt), (2) session.create needs directory + agent params (not just title), (3) SDK response is wrapped in { data, request, response } even with throwOnError: true — must access response.data, (4) each task executes sequentially in same session for context, (5) incremental withSave after each task for live log updates",
       "created": 1780529220992
+    },
+    {
+      "id": "01KT9N9X9EVEJ3QWP6EJEAVTK1",
+      "frase": "User added circuit system: packages/core/src/circuit/ (circuit.ts, edge.ts, execution.ts, node.ts, schema.ts, sql.ts + migration), circuit-engine.ts (639 lines), updated project-panel.tsx and projects-storage.ts for circuit integration, added haz/haz.cmd scripts.",
+      "created": 1780588279086
     }
   ]
 }
