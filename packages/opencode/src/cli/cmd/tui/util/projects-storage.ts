@@ -21,15 +21,21 @@ export interface SubAgent {
   log?: SubAgentLog[]
 }
 
+export type CircuitMode = "pipeline" | "evaluator" | "supervisor"
+
 export interface CircuitConnection {
   from: string
   to: string
+  condition?: string
 }
 
 export interface Circuit {
   id: string
   name: string
   connections: CircuitConnection[]
+  cron: string
+  mode: CircuitMode
+  maxLoops?: number // for evaluator mode
 }
 
 export interface ProjectFile {
@@ -160,7 +166,15 @@ export function updateSubAgent(projects: Project[], projectId: string, agentId: 
 export function addCircuit(projects: Project[], projectId: string, name: string): Project[] {
   return projects.map((p) =>
     p.id === projectId
-      ? { ...p, circuits: [...p.circuits, { id: generateId(), name, connections: [] }], updatedAt: Date.now() }
+      ? { ...p, circuits: [...p.circuits, { id: generateId(), name, connections: [], cron: "", mode: "pipeline", maxLoops: 3 }], updatedAt: Date.now() }
+      : p,
+  )
+}
+
+export function updateCircuit(projects: Project[], projectId: string, circuitId: string, patch: Partial<Circuit>): Project[] {
+  return projects.map((p) =>
+    p.id === projectId
+      ? { ...p, circuits: p.circuits.map((c) => (c.id === circuitId ? { ...c, ...patch } : c)), updatedAt: Date.now() }
       : p,
   )
 }
@@ -171,13 +185,14 @@ export function addConnection(
   circuitId: string,
   from: string,
   to: string,
+  condition?: string,
 ): Project[] {
   return projects.map((p) =>
     p.id === projectId
       ? {
           ...p,
           circuits: p.circuits.map((c) =>
-            c.id === circuitId ? { ...c, connections: [...c.connections, { from, to }] } : c,
+            c.id === circuitId ? { ...c, connections: [...c.connections, { from, to, condition }] } : c,
           ),
           updatedAt: Date.now(),
         }

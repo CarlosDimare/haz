@@ -22,6 +22,7 @@ import {
   removeSubAgent,
   updateSubAgent,
   addCircuit,
+  updateCircuit,
   addConnection,
   removeConnection,
   addProjectFile,
@@ -31,6 +32,7 @@ import {
   type SubAgentLog,
   type ProjectFile,
 } from "@tui/util/projects-storage"
+import { circuitEngine } from "@tui/util/circuit-engine"
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -73,6 +75,7 @@ export function ProjectPanel(props: {
   const [expandedEntries, setExpandedEntries] = createSignal<Set<string>>(new Set())
   const [toDelete, setToDelete] = createSignal<{ type: "project" | "agent" | "circuit"; id: string } | null>(null)
   const runningAgents = new Set<string>()
+  const [circuitRunningNodes, setCircuitRunningNodes] = createSignal<Map<string, "running" | "completed" | "failed" | "paused">>(new Map())
 
   // ── Load / save ────────────────────────────────────────────────────────
 
@@ -318,7 +321,158 @@ export function ProjectPanel(props: {
       void DialogAlert.show(dialog, "Conexión inválida", "Un agente no puede conectarse a sí mismo.")
       return
     }
-    withSave((list) => addConnection(list, projId, circuitId, result.src, result.dst))
+    // Optional condition
+    const condition = await DialogPrompt.show(dialog, "Condición (opcional)", {
+      placeholder: "Ej: contains:éxito | not-empty | length>100 | dejar vacío para siempre",
+    })
+    withSave((list) => addConnection(list, projId, circuitId, result.src, result.dst, condition ?? undefined))
+  }
+
+  async function handleEditCircuitMode(projId: string, circuit: { id: string; name: string; mode?: string; maxLoops?: number }) {
+    const modeResult = await new Promise<string | null>((resolve) => {
+      dialog.replace(
+        () => (
+          <DialogSelect<string>
+            title="Modo de circuito"
+            options={[
+              { title: "Pipeline", description: "Ejecución por niveles del DAG (por defecto)", value: "pipeline" },
+              { title: "Evaluator-Optimizer", description: "Genera → Evalúa → Mejora en loop hasta aprobar", value: "evaluator" },
+              { title: "Supervisor/Worker", description: "Supervisor planifica y delega sub-tareas a workers", value: "supervisor" },
+            ]}
+            onSelect={(opt) => { resolve(opt.value); dialog.clear() }}
+          />
+        ),
+        () => resolve(null),
+      )
+    })
+    if (!modeResult) return
+    const patch: Record<string, any> = { mode: modeResult }
+    if (modeResult === "evaluator") {
+      const loops = await DialogPrompt.show(dialog, "Iteraciones máximas", {
+        value: String(circuit.maxLoops ?? 3),
+        placeholder: "Número máximo de loops (ej: 3)",
+      })
+      if (loops) patch.maxLoops = Number.parseInt(loops) || 3
+    }
+    withSave((list) => updateCircuit(list, projId, circuit.id, patch))
+  }
+
+  // ── Circuit execution ──────────────────────────────────────────────────────
+
+  async function handleRunCircuit(projId: string, circuit: { id: string; name: string; cron?: string; connections: { from: string; to: string }[] }) {
+    const proj = projects().find((p) => p.id === projId)
+    if (!proj) return
+
+    const activeAgents = proj.subAgents.filter((a) => a.enabled && a.tasks.trim())
+    if (activeAgents.length === 0) {
+      void DialogAlert.show(dialog, "Circuito", "No hay agentes habilitados con tareas asignadas.")
+      return
+    }
+
+    const currentRoute = route.data
+    const parentSessionId = currentRoute.type === "session" ? currentRoute.sessionID : undefined
+    if (!parentSessionId) {
+      void DialogAlert.show(dialog, "Circuito", "Abrí una sesión primero.")
+      return
+    }
+
+    // Mark all agents in the circuit as having running state
+    const nodeStatus = new Map<string, "running" | "completed" | "failed">()
+    for (const agent of activeAgents) {
+      nodeStatus.set(agent.id, "running")
+    }
+    setCircuitRunningNodes(new Map(nodeStatus))
+
+    // Expand all agent logs so user sees progress
+    setExpandedLogs((prev) => {
+      const next = new Set(prev)
+      for (const a of activeAgents) next.add(a.id)
+      return next
+    })
+
+    // Build onPause handler for human-in-the-loop
+    const onPause = async (nodeId: string, agentName: string, pauseMsg: string): Promise<string | null> => {
+      const result = await DialogPrompt.show(dialog, `⏸ ${agentName}: ${pauseMsg}`, {
+        placeholder: "Escribí tu input o presioná Esc para cancelar...",
+      })
+      return result ?? null
+    }
+
+    try {
+      const result = await circuitEngine.execute({
+        circuit: { id: circuit.id, name: circuit.name, cron: circuit.cron ?? "", connections: circuit.connections, mode: (circuit as any).mode ?? "pipeline", maxLoops: (circuit as any).maxLoops ?? 3 },
+        agents: proj.subAgents,
+        allCircuits: proj.circuits,
+        sdk: { client: sdk.client, directory: sdk.directory ?? "" },
+        parentSessionId,
+        onPause,
+        onLog: (nodeId, level, message, detail) => {
+          if (!nodeId) {
+            // Circuit-level log — push to a designated circuit log? For now, log to the project
+            return
+          }
+          withSave((list) => {
+            const existing = list.find((p) => p.id === projId)
+            if (!existing) return list
+            const agent = existing.subAgents.find((a) => a.id === nodeId)
+            if (!agent) return list
+            const logs = [...(agent.log ?? []), { timestamp: Date.now(), level, message, detail: detail ?? message }]
+            return updateSubAgent(list, projId, nodeId, { log: logs, lastRun: Date.now() })
+          })
+        },
+        onProgress: (nodeId, status) => {
+          setCircuitRunningNodes((prev) => {
+            const next = new Map(prev)
+            next.set(nodeId, status)
+            return next
+          })
+        },
+      })
+
+      // Add output files
+      if (result.outputFiles.length > 0) {
+        withSave((list) => {
+          let updated = list
+          for (const file of result.outputFiles) {
+            updated = addProjectFile(updated, projId, file.path, file.content, file.agentId)
+          }
+          return updated
+        })
+      }
+
+      // Mark completion in each agent's log
+      for (const r of result.results) {
+        withSave((list) => {
+          const logs = list
+            .find((p) => p.id === projId)
+            ?.subAgents.find((a) => a.id === r.nodeId)?.log ?? []
+          return updateSubAgent(list, projId, r.nodeId, {
+            log: [...logs, { timestamp: Date.now(), level: "result" as const, message: `✓ ${r.duration}ms` }],
+            lastRun: Date.now(),
+          })
+        })
+      }
+    } catch (e: any) {
+      void DialogAlert.show(dialog, "Error", `Error ejecutando circuito: ${e?.message ?? e}`)
+    } finally {
+      setCircuitRunningNodes(new Map())
+    }
+  }
+
+  async function handleEditCircuitCron(projId: string, circuit: { id: string; name: string; cron?: string }) {
+    const result = await new Promise<string | null>((resolve) => {
+      dialog.replace(
+        () => (
+          <CronDialog
+            agent={{ id: circuit.id, name: circuit.name, cron: circuit.cron ?? "" } as any}
+            onSelect={resolve}
+          />
+        ),
+        () => resolve(null),
+      )
+    })
+    if (result === null) return
+    withSave((list) => updateCircuit(list, projId, circuit.id, { cron: result }))
   }
 
   // ── File editor ────────────────────────────────────────────────────────
@@ -940,6 +1094,9 @@ export function ProjectPanel(props: {
                                 })
                               }
 
+                              const runningNodes = () => circuitRunningNodes()
+                              const isCircuitRunning = () => runningNodes().size > 0
+
                               return (
                                 <box flexDirection="column" gap={0}>
                                   <box flexDirection="row" gap={1}>
@@ -950,6 +1107,31 @@ export function ProjectPanel(props: {
                                     >
                                       {circExpanded() ? "▾" : "▸"} {circuit.name || "sin nombre"}
                                     </text>
+                                    <Show when={(circuit as any).mode === "evaluator"}>
+                                      <text fg={theme.info} flexShrink={0} attributes={TextAttributes.ITALIC}>
+                                        ↻ev
+                                      </text>
+                                    </Show>
+                                    <Show when={(circuit as any).mode === "supervisor"}>
+                                      <text fg={theme.warning} flexShrink={0} attributes={TextAttributes.ITALIC}>
+                                        ◈sv
+                                      </text>
+                                    </Show>
+                                    <Show when={!isCircuitRunning()}>
+                                      <text
+                                        fg={theme.success}
+                                        attributes={TextAttributes.BOLD}
+                                        flexShrink={0}
+                                        onMouseUp={() => void handleRunCircuit(proj.id, circuit)}
+                                      >
+                                        ▶ run
+                                      </text>
+                                    </Show>
+                                    <Show when={isCircuitRunning()}>
+                                      <text fg={theme.warning} flexShrink={0}>
+                                        ◉
+                                      </text>
+                                    </Show>
                                     <text
                                       fg={theme.primary}
                                       flexShrink={0}
@@ -958,6 +1140,13 @@ export function ProjectPanel(props: {
                                       }
                                     >
                                       +link
+                                    </text>
+                                    <text
+                                      fg={theme.textMuted}
+                                      flexShrink={0}
+                                      onMouseUp={() => void handleEditCircuitMode(proj.id, circuit)}
+                                    >
+                                      ⚙
                                     </text>
                                   </box>
 
@@ -971,36 +1160,85 @@ export function ProjectPanel(props: {
                                       }
                                     >
                                       <box paddingLeft={1} flexDirection="column" gap={0}>
-                                        <For each={circuit.connections}>
-                                          {(conn, idx) => {
-                                            const src = agentById(proj, conn.from)
-                                            const dst = agentById(proj, conn.to)
-                                            return (
-                                              <box flexDirection="row" gap={1}>
-                                                <text fg={theme.textMuted}>
-                                                  {src?.name ?? "?"}
-                                                </text>
-                                                <text fg={theme.accent}>→</text>
-                                                <text fg={theme.textMuted} flexGrow={1}>
-                                                  {dst?.name ?? "?"}
-                                                </text>
-                                                <text
-                                                  fg={theme.textMuted}
-                                                  flexShrink={0}
-                                                  onMouseDown={() => {
-                                                    withSave((list) =>
-                                                      removeConnection(list, proj.id, circuit.id, idx()),
-                                                    )
-                                                  }}
-                                                >
-                                                  ✕
-                                                </text>
-                                              </box>
-                                            )
-                                          }}
-                                        </For>
+                                          <For each={circuit.connections}>
+                                            {(conn, idx) => {
+                                              const src = agentById(proj, conn.from)
+                                              const dst = agentById(proj, conn.to)
+                                              const srcStatus = () => runningNodes().get(conn.from)
+                                              const dstStatus = () => runningNodes().get(conn.to)
+                                              const statusColor = (s?: string) =>
+                                                s === "running" ? theme.warning
+                                                  : s === "completed" ? theme.success
+                                                  : s === "failed" ? theme.error
+                                                  : theme.textMuted
+                                              const statusIcon = (s?: string) =>
+                                                s === "running" ? "◉"
+                                                  : s === "completed" ? "✓"
+                                                  : s === "failed" ? "✗"
+                                                  : "●"
+                                              return (
+                                                <box flexDirection="row" gap={1}>
+                                                  <text fg={statusColor(srcStatus())} flexShrink={0}>
+                                                    {statusIcon(srcStatus())}
+                                                  </text>
+                                                  <text fg={statusColor(srcStatus())} wrapMode="none" truncate>
+                                                    {src?.name ?? "?"}
+                                                  </text>
+                                                  <text fg={theme.accent}>→</text>
+                                                  <Show when={conn.condition}>
+                                                    <text fg={theme.warning} flexShrink={0}>
+                                                      ?
+                                                    </text>
+                                                  </Show>
+                                                  <text fg={statusColor(dstStatus())} flexShrink={0}>
+                                                    {statusIcon(dstStatus())}
+                                                  </text>
+                                                  <text fg={statusColor(dstStatus())} flexGrow={1} wrapMode="none" truncate>
+                                                    {dst?.name ?? "?"}
+                                                  </text>
+                                                  <Show when={!isCircuitRunning()}>
+                                                    <text
+                                                      fg={theme.textMuted}
+                                                      flexShrink={0}
+                                                      onMouseDown={() => {
+                                                        withSave((list) =>
+                                                          removeConnection(list, proj.id, circuit.id, idx()),
+                                                        )
+                                                      }}
+                                                    >
+                                                      ✕
+                                                    </text>
+                                                  </Show>
+                                                </box>
+                                              )
+                                            }}
+                                          </For>
                                       </box>
                                     </Show>
+
+                                      {/* Cron info */}
+                                      <box paddingLeft={1} flexDirection="row" gap={1}>
+                                        <text fg={theme.textMuted} flexShrink={0}>
+                                          cron:
+                                        </text>
+                                        <text
+                                          fg={circuit.cron ? theme.info : theme.textMuted}
+                                          onMouseUp={() => void handleEditCircuitCron(proj.id, circuit)}
+                                        >
+                                          {cronLabel(circuit.cron ?? "")}
+                                        </text>
+                                      </box>
+
+                                      {/* Plan preview */}
+                                      <box paddingLeft={1} flexDirection="row" gap={1}>
+                                        <text fg={theme.textMuted}>
+                                          {(() => {
+                                            const plan = circuitEngine.plan(circuit, proj.subAgents)
+                                            const modeLabel = plan.mode === "supervisor" ? ` (sv: ${plan.supervisor})` : ""
+                                            return `${plan.nodeCount} agentes, ${plan.levels.length} niveles${modeLabel}`
+                                          })()}
+                                        </text>
+                                      </box>
                                   </Show>
                                 </box>
                               )
