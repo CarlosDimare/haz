@@ -1,0 +1,12 @@
+Manage projects, sub-agents, and circuits in the haz project system.
+
+This tool stores project configurations in .haz/projects.json and allows you to:
+
+- Create new projects
+- List existing projects with their sub-agents and circuits
+- Add sub-agents to projects (with tasks and optional cron schedule)
+- Update sub-agent tasks
+- Add circuits to projects
+- Add connections between sub-agents in a circuit
+
+Use this tool to organize work into projects, define multi-agent circuits, and manage task delegation.

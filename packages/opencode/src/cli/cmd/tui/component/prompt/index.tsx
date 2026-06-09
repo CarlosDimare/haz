@@ -4,6 +4,7 @@ import {
   TextareaRenderable,
   MouseEvent,
   PasteEvent,
+  TextAttributes,
   decodePasteBytes,
   type KeyEvent,
   type Renderable,
@@ -1724,7 +1725,18 @@ export function Prompt(props: PromptProps) {
                 </box>
               )}
             </Match>
-            <Match when={true}>{props.hint ?? <text />}</Match>
+            <Match when={true}>
+              <box paddingLeft={3} flexDirection="row" gap={1}>
+                <Show when={local.agent.current()}>
+                  {(agent) => (
+                    <text fg={local.agent.color(agent().name)} attributes={TextAttributes.BOLD}>
+                      [{agent().name}]
+                    </text>
+                  )}
+                </Show>
+                {props.hint ?? <text />}
+              </box>
+            </Match>
           </Switch>
           <Show when={!props.hideMeta}>
             <Show when={status().type !== "retry"}>
@@ -1745,8 +1757,11 @@ export function Prompt(props: PromptProps) {
                         )}
                       </Match>
                       <Match when={true}>
-                        <text fg={theme.text}>
-                          {agentShortcut()} <span style={{ fg: theme.textMuted }}>agents</span>
+                        <text>
+                          {agentShortcut()}{" "}
+                          <span style={{ fg: local.agent.color(local.agent.current()?.name ?? "") }}>
+                            {local.agent.current()?.name ?? "agents"}
+                          </span>
                         </text>
                       </Match>
                     </Switch>

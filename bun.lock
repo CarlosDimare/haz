@@ -460,6 +460,7 @@
       "version": "1.15.13",
       "bin": {
         "opencode": "./bin/opencode",
+        "haz": "./bin/opencode",
       },
       "dependencies": {
         "@actions/core": "1.11.1",

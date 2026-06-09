@@ -14,6 +14,8 @@ import PROMPT_EXPLORE from "./prompt/explore.txt"
 import PROMPT_SCOUT from "./prompt/scout.txt"
 import PROMPT_SUMMARY from "./prompt/summary.txt"
 import PROMPT_TITLE from "./prompt/title.txt"
+import PROMPT_WALSH from "./prompt/walsh.txt"
+import PROMPT_MASTRO from "./prompt/mastro.txt"
 import { Permission } from "@/permission"
 import { mergeDeep, pipe, sortBy, values } from "remeda"
 import { Global } from "@opencode-ai/core/global"
@@ -167,6 +169,30 @@ export const layer = Layer.effect(
             mode: "primary",
             native: true,
           },
+          trama: {
+            name: "trama",
+            description: "Modo plan (trama). No permite herramientas de edición.",
+            options: {},
+            color: "#6366f1",
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                trama_exit: "allow",
+                external_directory: {
+                  [path.join(Global.Path.data, "plans", "*")]: "allow",
+                },
+                edit: {
+                  "*": "deny",
+                  [path.join(".opencode", "plans", "*.md")]: "allow",
+                  [path.relative(ctx.worktree, path.join(Global.Path.data, path.join("plans", "*.md")))]: "allow",
+                },
+              }),
+              user,
+            ),
+            mode: "primary",
+            native: true,
+          },
           general: {
             name: "general",
             description: `Agente de propósito general para investigar preguntas complejas y ejecutar tareas multi-paso. Usá este agente para ejecutar varias unidades de trabajo en paralelo.`,
@@ -179,6 +205,49 @@ export const layer = Layer.effect(
             ),
             options: {},
             mode: "subagent",
+            native: true,
+          },
+          walsh: {
+            name: "walsh",
+            description: "Periodista de investigación. Búsqueda exhaustiva, verificación de fuentes, perspectiva de clase.",
+            color: "#dc2626",
+            options: {},
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                walsh_deep_search: "allow",
+                walsh_verify: "allow",
+                edit: { "*": "deny" },
+                write: { "*": "deny" },
+                apply_patch: { "*": "deny" },
+                todowrite: "deny",
+              }),
+              user,
+            ),
+            prompt: PROMPT_WALSH,
+            mode: "primary",
+            native: true,
+          },
+          mastro: {
+            name: "mastro",
+            description: "Asistente conversacional con perspectiva de clase y humor estilo Les Luthiers.",
+            color: "#eab308",
+            options: {},
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                edit: { "*": "deny" },
+                write: { "*": "deny" },
+                apply_patch: { "*": "deny" },
+                shell: { "*": "deny" },
+                todowrite: "deny",
+              }),
+              user,
+            ),
+            prompt: PROMPT_MASTRO,
+            mode: "primary",
             native: true,
           },
           explore: {

@@ -66,6 +66,9 @@ export const rpc = {
       body,
     }
   },
+  warmup() {
+    Server.Default()
+  },
   snapshot() {
     const result = writeHeapSnapshot("server.heapsnapshot")
     return result

@@ -157,6 +157,8 @@ export const TuiThreadCommand = cmd({
       }
 
       const client = Rpc.client<typeof rpc>(worker)
+      // Pre-warm the server so the first fetch doesn't block on lazy init.
+      client.call("warmup", undefined).catch(() => {})
       const error = (e: unknown) => {
         Log.Default.error("process error", { error: errorMessage(e) })
       }

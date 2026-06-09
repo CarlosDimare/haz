@@ -1,0 +1,12 @@
+Verificación de una afirmación o noticia contra fuentes.
+
+Buscá corroboración o contradicción de una afirmación en múltiples fuentes independientes. Verificá fechas de publicación, detectá posibles sesgos, y evaluá la confiabilidad de las fuentes.
+
+Call this tool when:
+- Necesitás determinar si una afirmación es verdadera
+- Querés verificar la fecha y el contexto de una noticia
+- Te presentaron un dato que requiere confirmación independiente
+
+Do NOT call this tool when:
+- Necesitás investigar un tema amplio (usá walsh_deep_search)
+- Solo querés leer una página web específica (usá webfetch)

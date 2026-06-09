@@ -1,6 +1,6 @@
 import { useProject } from "@tui/context/project"
 import { useSync } from "@tui/context/sync"
-import { createMemo, createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js"
+import { createMemo, createSignal, For, Show } from "solid-js"
 import { useTheme } from "../../context/theme"
 import { useTuiConfig } from "../../context/tui-config"
 import { TextAttributes } from "@opentui/core"
@@ -10,12 +10,13 @@ import { relativeTime } from "../../feature-plugins/session/util"
 import { useSDK } from "@tui/context/sdk"
 import { errorMessage } from "@/util/error"
 import { useToast } from "../../ui/toast"
+import { useDialog } from "../../ui/dialog"
+import { DialogProjects } from "../../component/dialog-projects"
 
 import { getScrollAcceleration } from "../../util/scroll"
 import { WorkspaceLabel } from "../../component/workspace-label"
-import { loadPersonality, getAllSkills } from "@tui/util/facet-skills"
 
-export function Sidebar(props: { sessionID: string; overlay?: boolean; onClose?: () => void; onImproveSkill?: (skill: string) => void }) {
+export function Sidebar(props: { sessionID: string; overlay?: boolean; onClose?: () => void }) {
   const project = useProject()
   const sync = useSync()
   const { theme } = useTheme()
@@ -23,6 +24,7 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean; onClose?:
   const { navigate } = useRoute()
   const sdk = useSDK()
   const toast = useToast()
+  const dialog = useDialog()
   const session = createMemo(() => sync.session.get(props.sessionID))
   const [toDelete, setToDelete] = createSignal<string | null>(null)
   const workspace = () => {
@@ -64,46 +66,6 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean; onClose?:
 
     return groups
   })
-
-  // Personalidad con auto-refresh cada 2s (detecta cambios en el prompt al instante)
-  const [personality, setPersonality] = createSignal<Awaited<ReturnType<typeof loadPersonality>> | undefined>(undefined)
-  const [expandedTraits, setExpandedTraits] = createSignal<Set<string>>(new Set())
-  const toggleTrait = (label: string) => {
-    setExpandedTraits((prev) => {
-      const next = new Set(prev)
-      if (next.has(label)) next.delete(label)
-      else next.add(label)
-      return next
-    })
-  }
-  const getDir = () => {
-    try {
-      // Intentar acceso tipo home (instance.path().directory)
-      return (project as any).instance.path().directory
-    } catch {
-      try {
-        // Intentar acceso tipo sidebar (data.instance.path.directory)
-        return (project as any).data.instance.path.directory
-      } catch {
-        return undefined
-      }
-    }
-  }
-  onMount(() => {
-    const dir = getDir()
-    loadPersonality(dir).then(setPersonality)
-    const id = setInterval(() => {
-      loadPersonality(getDir()).then(setPersonality)
-    }, 2000)
-    onCleanup(() => clearInterval(id))
-  })
-
-  const [skills] = createResource(async () => {
-    const result = await sdk.client.app.skills()
-    return result.data ?? []
-  })
-
-  const allSkills = createMemo(() => getAllSkills(skills() ?? []))
 
   async function deleteSession(id: string) {
     try {
@@ -209,84 +171,6 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean; onClose?:
               </Show>
             </box>
 
-            {/* Personalidad — desde el system prompt */}
-            <box flexDirection="column" gap={1} paddingTop={1}>
-              <text fg={theme.textMuted} attributes={TextAttributes.BOLD}>
-                Personalidad
-              </text>
-              <Show when={personality() && personality()!.length > 0} fallback={
-                <text fg={theme.textMuted} paddingLeft={1}>Cargando...</text>
-              }>
-                <For each={personality()!}>
-                  {(trait) => {
-                    const expanded = () => expandedTraits().has(trait.label)
-                    const barLen = Math.round(trait.value * 6)
-                    const bar = "\u2593".repeat(barLen) + "\u2591".repeat(6 - barLen)
-                    return (
-                      <box flexDirection="column" gap={0}>
-                        <box
-                          paddingLeft={1}
-                          flexDirection="row" gap={1}
-                          onMouseDown={() => toggleTrait(trait.label)}
-                        >
-                          <text fg={(theme as any)[trait.color] ?? theme.text}>
-                            {trait.label}
-                          </text>
-                          <text fg={theme.textMuted}>{bar}</text>
-                          <text fg={theme.textMuted}>
-                            {Math.round(trait.value * 100)}%
-                          </text>
-                          <Show when={trait.sources.length > 0}>
-                            <text fg={theme.textMuted}>{expanded() ? "▾" : "▸"}</text>
-                          </Show>
-                        </box>
-                        <Show when={expanded() && trait.sources.length > 0}>
-                          <box paddingLeft={3} flexDirection="column" gap={0}>
-                            <For each={trait.sources}>
-                              {(src) => (
-                                <box flexDirection="column" gap={0}>
-                                  <text fg={theme.textMuted} attributes={TextAttributes.ITALIC}>
-                                    ─ {src.section} ─
-                                  </text>
-                                  <For each={src.lines}>
-                                    {(line) => (
-                                      <text fg={theme.textMuted} wrapMode="none" truncate>
-                                        {line}
-                                      </text>
-                                    )}
-                                  </For>
-                                </box>
-                              )}
-                            </For>
-                          </box>
-                        </Show>
-                      </box>
-                    )
-                  }}
-                </For>
-              </Show>
-            </box>
-
-            <box height={1} />
-
-            {/* Caja de Herramientas */}
-            <box flexDirection="column" gap={1}>
-              <text fg={theme.textMuted} attributes={TextAttributes.BOLD}>
-                Caja de Herramientas ({allSkills().length})
-              </text>
-              <box paddingLeft={1} flexDirection="column" gap={0}>
-                <For each={allSkills()}>
-                  {(skill) => (
-                    <text fg={theme.textMuted} wrapMode="none" truncate>
-                      · {skill.name}
-                    </text>
-                  )}
-                </For>
-              </box>
-            </box>
-
-            <box height={1} />
-
             {/* Session history */}
             <For each={groups()}>
               {(group) => (
@@ -351,7 +235,12 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean; onClose?:
           </box>
         </scrollbox>
 
-        <box flexShrink={0} gap={1} paddingTop={1}>
+        <box flexShrink={0} gap={1} paddingTop={1} flexDirection="column">
+          <box
+            onMouseDown={() => dialog.replace(() => <DialogProjects />)}
+          >
+            <text fg={theme.primary}>+ Proyectos / Agentes</text>
+          </box>
           <text fg={theme.textMuted}>
             <span style={{ fg: theme.success }}>•</span>
             {" "}

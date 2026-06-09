@@ -62,8 +62,8 @@ import { DialogConfirm } from "@tui/ui/dialog-confirm"
 import { DialogTimeline } from "./dialog-timeline"
 import { DialogForkFromTimeline } from "./dialog-fork-from-timeline"
 import { DialogSessionRename } from "../../component/dialog-session-rename"
+import { DialogProjects } from "../../component/dialog-projects"
 import { Sidebar } from "./sidebar"
-import { ProjectPanel } from "@tui/component/project-panel"
 import { SubagentFooter } from "./subagent-footer.tsx"
 import { LANGUAGE_EXTENSIONS } from "@/lsp/language"
 import parsers from "../../../../../../parsers-config.ts"
@@ -223,9 +223,6 @@ export function Session() {
   const dimensions = useTerminalDimensions()
   const [sidebar, setSidebar] = kv.signal<"auto" | "hide">("sidebar", "auto")
   const [sidebarOpen, setSidebarOpen] = createSignal(true)
-  const [projectPanel, setProjectPanel] = kv.signal<"auto" | "hide">("project_panel", "auto")
-  const [projectPanelOpen, setProjectPanelOpen] = createSignal(false)
-  const [projectPanelMaximized, setProjectPanelMaximized] = createSignal(false)
   const [conceal, setConceal] = createSignal(true)
   const thinking = useThinkingMode()
   const thinkingMode = thinking.mode
@@ -245,21 +242,11 @@ export function Session() {
     if (sidebar() === "auto" && wide()) return true
     return false
   })
-  const projectPanelVisible = createMemo(() => {
-    if (projectPanelOpen()) return true
-    if (projectPanel() === "auto" && wide()) return true
-    return false
-  })
   const showTimestamps = createMemo(() => timestamps() === "show")
-  const projectPanelWidth = createMemo(() => {
-    if (!projectPanelVisible()) return 0
-    if (projectPanelMaximized()) return Math.floor(dimensions().width * 0.65)
-    return 44
-  })
+
   const contentWidth = createMemo(() => {
-    const w = dimensions().width - projectPanelWidth() - 4
-    // Leave room for sidebar even when maximized, or hide it if too tight
-    return w - (sidebarVisible() && !projectPanelMaximized() ? 42 : 0)
+    const w = dimensions().width - 4
+    return w - (sidebarVisible() ? 42 : 0)
   })
   const providers = createMemo(() => Model.index(sync.data.provider))
 
@@ -1153,21 +1140,16 @@ export function Session() {
         }}
       >
         <box flexDirection="row" flexGrow={1} minHeight={0}>
-          <Show when={projectPanelVisible()}>
+          <Show when={sidebarVisible()}>
             <Switch>
               <Match when={wide()}>
-                <ProjectPanel
-                  width={projectPanelWidth() || undefined}
-                  isMaximized={projectPanelMaximized()}
-                  onToggleMaximize={() => setProjectPanelMaximized((v) => !v)}
-                  onClose={() => {
-                    const isVisible = projectPanelVisible()
-                    batch(() => {
-                      setProjectPanel(() => (isVisible ? "hide" : "auto"))
-                      setProjectPanelOpen(!isVisible)
-                    })
-                  }}
-                />
+                <Sidebar sessionID={route.sessionID} onClose={() => {
+                  const isVisible = sidebarVisible()
+                  batch(() => {
+                    setSidebar(() => (isVisible ? "hide" : "auto"))
+                    setSidebarOpen(!isVisible)
+                  })
+                }} />
               </Match>
               <Match when={!wide()}>
                 <box
@@ -1178,26 +1160,20 @@ export function Session() {
                   bottom={0}
                   backgroundColor={RGBA.fromInts(0, 0, 0, 70)}
                   onMouseDown={() => {
-                    const isVisible = projectPanelVisible()
+                    const isVisible = sidebarVisible()
                     batch(() => {
-                      setProjectPanel(() => (isVisible ? "hide" : "auto"))
-                      setProjectPanelOpen(!isVisible)
+                      setSidebar(() => (isVisible ? "hide" : "auto"))
+                      setSidebarOpen(!isVisible)
                     })
                   }}
                 >
-                  <ProjectPanel
-                    overlay
-                    width={projectPanelWidth() || undefined}
-                    isMaximized={projectPanelMaximized()}
-                    onToggleMaximize={() => setProjectPanelMaximized((v) => !v)}
-                    onClose={() => {
-                      const isVisible = projectPanelVisible()
-                      batch(() => {
-                        setProjectPanel(() => (isVisible ? "hide" : "auto"))
-                        setProjectPanelOpen(!isVisible)
-                      })
-                    }}
-                  />
+                  <Sidebar sessionID={route.sessionID} overlay onClose={() => {
+                    const isVisible = sidebarVisible()
+                    batch(() => {
+                      setSidebar(() => (isVisible ? "hide" : "auto"))
+                      setSidebarOpen(!isVisible)
+                    })
+                  }} />
                 </box>
               </Match>
             </Switch>
@@ -1351,11 +1327,7 @@ export function Session() {
                            <text
                               fg={theme.primary}
                               onMouseDown={() => {
-                                const isVisible = projectPanelVisible()
-                                batch(() => {
-                                  setProjectPanel(() => (isVisible ? "hide" : "auto"))
-                                  setProjectPanelOpen(!isVisible)
-                                })
+                                dialog.replace(() => <DialogProjects />)
                               }}
                             >
                               ⊞
@@ -1382,55 +1354,7 @@ export function Session() {
             </Show>
             <Toast />
           </box>
-          <Show when={sidebarVisible()}>
-            <Switch>
-              <Match when={wide()}>
-                <Sidebar sessionID={route.sessionID} onClose={() => {
-                  const isVisible = sidebarVisible()
-                  batch(() => {
-                    setSidebar(() => (isVisible ? "hide" : "auto"))
-                    setSidebarOpen(!isVisible)
-                  })
-                }} onImproveSkill={(skill) => {
-                  if (prompt) {
-                    prompt.set({ input: `Mejorar: ${skill}`, parts: [] })
-                    prompt.focus()
-                  }
-                }} />
-              </Match>
-              <Match when={!wide()}>
-                <box
-                  position="absolute"
-                  top={0}
-                  left={0}
-                  right={0}
-                  bottom={0}
-                  alignItems="flex-end"
-                  backgroundColor={RGBA.fromInts(0, 0, 0, 70)}
-                  onMouseDown={() => {
-                    const isVisible = sidebarVisible()
-                    batch(() => {
-                      setSidebar(() => (isVisible ? "hide" : "auto"))
-                      setSidebarOpen(!isVisible)
-                    })
-                  }}
-                >
-                  <Sidebar sessionID={route.sessionID} onClose={() => {
-                    const isVisible = sidebarVisible()
-                    batch(() => {
-                      setSidebar(() => (isVisible ? "hide" : "auto"))
-                      setSidebarOpen(!isVisible)
-                    })
-                  }} onImproveSkill={(skill) => {
-                    if (prompt) {
-                      prompt.set({ input: `Mejorar: ${skill}`, parts: [] })
-                      prompt.focus()
-                    }
-                  }} />
-                </box>
-              </Match>
-            </Switch>
-          </Show>
+
         </box>
       </context.Provider>
     </PathFormatterProvider>

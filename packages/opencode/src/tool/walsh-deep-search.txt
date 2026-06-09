@@ -1,0 +1,12 @@
+Búsqueda profunda con múltiples queries en paralelo y síntesis.
+
+Lanzá entre 3 y 9 búsquedas web simultáneas (según la profundidad solicitada) desde distintos ángulos para cubrir un tema exhaustivamente, y devolvé una síntesis con fuentes agrupadas y análisis cruzado.
+
+Call this tool when:
+- Necesitás cubrir un tema desde múltiples perspectivas
+- Querés asegurarte de no dejar ángulos sin explorar
+- La investigación requiere profundidad y no solo una respuesta rápida
+
+Do NOT call this tool when:
+- Una búsqueda simple es suficiente
+- Solo necesitás verificar un dato puntual (usá walsh_verify en su lugar)

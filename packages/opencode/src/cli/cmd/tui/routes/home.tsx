@@ -1,10 +1,9 @@
 import { Prompt, type PromptRef } from "@tui/component/prompt"
-import { batch, createEffect, createMemo, createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js"
-import { Logo } from "../component/logo"
+import { batch, createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { useSync } from "../context/sync"
 import { Toast } from "../ui/toast"
 import { useArgs } from "../context/args"
-import { useRouteData } from "@tui/context/route"
+import { useRoute, useRouteData } from "@tui/context/route"
 import { usePromptRef } from "../context/prompt"
 import { useLocal } from "../context/local"
 import { TuiPluginRuntime } from "@/cli/cmd/tui/plugin/runtime"
@@ -15,7 +14,11 @@ import { useTheme } from "@tui/context/theme"
 import { useProject } from "@tui/context/project"
 import { useSDK } from "@tui/context/sdk"
 import { TextAttributes } from "@opentui/core"
-import { loadPersonality, getAllSkills } from "@tui/util/facet-skills"
+import { useToast } from "../ui/toast"
+import { useDialog } from "../ui/dialog"
+import { relativeTime } from "../feature-plugins/session/util"
+import { errorMessage } from "@/util/error"
+import { DialogProjects } from "../component/dialog-projects"
 
 let once = false
 const placeholder = {
@@ -43,36 +46,6 @@ export function Home() {
     return configured ?? 75
   })
   let sent = false
-
-  // Personalidad con auto-refresh cada 2s (detecta cambios en el prompt al instante)
-  const [personality, setPersonality] = createSignal<Awaited<ReturnType<typeof loadPersonality>> | undefined>(undefined)
-  const [expandedTraits, setExpandedTraits] = createSignal<Set<string>>(new Set())
-  const toggleTrait = (label: string) => {
-    setExpandedTraits((prev) => {
-      const next = new Set(prev)
-      if (next.has(label)) next.delete(label)
-      else next.add(label)
-      return next
-    })
-  }
-  const getDir = () => {
-    try { return project.instance.path().directory } catch { return undefined }
-  }
-  onMount(() => {
-    const dir = getDir()
-    loadPersonality(dir).then(setPersonality)
-    const id = setInterval(() => {
-      loadPersonality(getDir()).then(setPersonality)
-    }, 2000)
-    onCleanup(() => clearInterval(id))
-  })
-
-  const [skills] = createResource(async () => {
-    const result = await sdk.client.app.skills()
-    return result.data ?? []
-  })
-
-  const allSkills = createMemo(() => getAllSkills(skills() ?? []))
 
   const toggleSidebar = () => {
     batch(() => {
@@ -111,37 +84,50 @@ export function Home() {
 
   const sidebarWidth = 42
 
+  const navigate = useRoute().navigate
+  const toast = useToast()
+  const dialog = useDialog()
+  const allSessions = createMemo(() =>
+    sync.data.session
+      .toSorted((a, b) => b.time.updated - a.time.updated),
+  )
+  const groups = createMemo(() => {
+    const today = new Date()
+    const todayStr = today.toDateString()
+    const yesterday = new Date(today.getTime() - 86400000).toDateString()
+    const groups: { label: string; sessions: typeof sync.data.session }[] = []
+    const todayGroup: typeof sync.data.session = []
+    const yesterdayGroup: typeof sync.data.session = []
+    const olderGroup: typeof sync.data.session = []
+    for (const s of allSessions()) {
+      const dateStr = new Date(s.time.updated).toDateString()
+      if (dateStr === todayStr) todayGroup.push(s)
+      else if (dateStr === yesterday) yesterdayGroup.push(s)
+      else olderGroup.push(s)
+    }
+    if (todayGroup.length) groups.push({ label: "Hoy", sessions: todayGroup })
+    if (yesterdayGroup.length) groups.push({ label: "Ayer", sessions: yesterdayGroup })
+    if (olderGroup.length) groups.push({ label: "Anterior", sessions: olderGroup })
+    return groups
+  })
+  const [toDelete, setToDelete] = createSignal<string | null>(null)
+  async function deleteSession(id: string) {
+    try {
+      const result = await sdk.client.session.delete({ sessionID: id })
+      if (result.error) {
+        toast.show({ variant: "error", title: "Error al eliminar sesión", message: errorMessage(result.error) })
+        return
+      }
+      await sync.session.refresh()
+      setToDelete(null)
+    } catch (err) {
+      toast.show({ variant: "error", title: "Error al eliminar sesión", message: errorMessage(err) })
+    }
+  }
+
   return (
     <>
       <box flexGrow={1} flexDirection="row" minHeight={0}>
-        <box flexGrow={1} alignItems="center" paddingLeft={2} paddingRight={2}>
-          <box flexGrow={1} minHeight={0} />
-          <box height={4} minHeight={0} flexShrink={1} />
-          <box flexShrink={0} flexDirection="row" alignItems="center" gap={2}>
-            <TuiPluginRuntime.Slot name="home_logo" mode="replace">
-              <Logo />
-            </TuiPluginRuntime.Slot>
-            <box
-              paddingLeft={1}
-              paddingRight={1}
-              onMouseDown={(e: any) => {
-                e?.stopPropagation?.()
-                toggleSidebar()
-              }}
-            >
-              <text fg={theme.textMuted}>☰ 🧿🧿</text>
-            </box>
-          </box>
-          <box height={1} minHeight={0} flexShrink={1} />
-          <box width="100%" maxWidth={promptMaxWidth()} zIndex={1000} paddingTop={1} flexShrink={0}>
-            <TuiPluginRuntime.Slot name="home_prompt" mode="replace" ref={bind}>
-              <Prompt ref={bind} hideMeta showPlaceholder={false} right={<TuiPluginRuntime.Slot name="home_prompt_right" />} placeholders={placeholder} />
-            </TuiPluginRuntime.Slot>
-          </box>
-          <TuiPluginRuntime.Slot name="home_bottom" />
-          <box flexGrow={1} minHeight={0} />
-          <Toast />
-        </box>
         <Show when={sidebarOpen()}>
           <box
             backgroundColor={theme.backgroundPanel}
@@ -169,91 +155,102 @@ export function Home() {
                     <text fg={theme.textMuted}>✕</text>
                   </box>
                   <text fg={theme.text} attributes={TextAttributes.BOLD}>
-                    🧿🧿 Panel
+                    Historial
                   </text>
                 </box>
 
                 <box height={1} />
 
-                {/* Personalidad — desde el system prompt */}
-                <box flexDirection="column" gap={1}>
-                  <text fg={theme.textMuted} attributes={TextAttributes.BOLD}>
-                    Personalidad
-                  </text>
-                  <Show when={personality() && personality()!.length > 0} fallback={
-                    <text fg={theme.textMuted} paddingLeft={1}>Cargando...</text>
-                  }>
-                    <For each={personality()!}>
-                      {(trait) => {
-                        const expanded = () => expandedTraits().has(trait.label)
-                        const barLen = Math.round(trait.value * 6)
-                        const bar = "\u2593".repeat(barLen) + "\u2591".repeat(6 - barLen)
-                        return (
-                          <box flexDirection="column" gap={0}>
+                {/* Conversation history */}
+                <For each={groups()}>
+                  {(group) => (
+                    <box flexDirection="column" gap={1}>
+                      <text fg={theme.textMuted} attributes={TextAttributes.BOLD}>
+                        {group.label}
+                      </text>
+                      <For each={group.sessions}>
+                        {(s) => {
+                          const deleting = () => toDelete() === s.id
+                          return (
                             <box
-                              paddingLeft={1}
-                              flexDirection="row" gap={1}
-                              onMouseDown={() => toggleTrait(trait.label)}
+                              flexDirection="row"
+                              justifyContent="space-between"
+                              gap={1}
                             >
-                              <text fg={(theme as any)[trait.color] ?? theme.text}>
-                                {trait.label}
-                              </text>
-                              <text fg={theme.textMuted}>{bar}</text>
-                              <text fg={theme.textMuted}>
-                                {Math.round(trait.value * 100)}%
-                              </text>
-                              <Show when={trait.sources.length > 0}>
-                                <text fg={theme.textMuted}>{expanded() ? "▾" : "▸"}</text>
-                              </Show>
-                            </box>
-                            <Show when={expanded() && trait.sources.length > 0}>
-                              <box paddingLeft={3} flexDirection="column" gap={0}>
-                                <For each={trait.sources}>
-                                  {(src) => (
-                                    <box flexDirection="column" gap={0}>
-                                      <text fg={theme.textMuted} attributes={TextAttributes.ITALIC}>
-                                        ─ {src.section} ─
-                                      </text>
-                                      <For each={src.lines}>
-                                        {(line) => (
-                                          <text fg={theme.textMuted} wrapMode="none" truncate>
-                                            {line}
-                                          </text>
-                                        )}
-                                      </For>
-                                    </box>
-                                  )}
-                                </For>
+                              <box
+                                flexGrow={1}
+                                flexDirection="column"
+                                gap={0}
+                                onMouseDown={() => {
+                                  if (deleting()) {
+                                    void deleteSession(s.id)
+                                  } else {
+                                    navigate({ type: "session", sessionID: s.id })
+                                  }
+                                }}
+                              >
+                                <text fg={deleting() ? theme.warning : theme.text} wrapMode="none" truncate>
+                                  {deleting() ? `¿Eliminar ${s.title}?` : s.title}
+                                </text>
                               </box>
-                            </Show>
-                          </box>
-                        )
-                      }}
-                    </For>
-                  </Show>
-                </box>
-
-                <box height={1} />
-
-                {/* Caja de Herramientas */}
-                <box flexDirection="column" gap={1}>
-                  <text fg={theme.textMuted} attributes={TextAttributes.BOLD}>
-                    Caja de Herramientas ({allSkills().length})
-                  </text>
-                  <box paddingLeft={1} flexDirection="column" gap={0}>
-                    <For each={allSkills()}>
-                      {(skill) => (
-                        <text fg={theme.textMuted} wrapMode="none" truncate>
-                          · {skill.name}
-                        </text>
-                      )}
-                    </For>
-                  </box>
-                </box>
+                              <text
+                                fg={deleting() ? theme.warning : theme.textMuted}
+                                flexShrink={0}
+                                onMouseDown={() => {
+                                  if (deleting()) {
+                                    setToDelete(null)
+                                  } else {
+                                    setToDelete(s.id)
+                                  }
+                                }}
+                              >
+                                {deleting() ? "✕" : relativeTime(s.time.updated)}
+                              </text>
+                            </box>
+                          )
+                        }}
+                      </For>
+                      <box height={1} />
+                    </box>
+                  )}
+                </For>
               </box>
             </scrollbox>
+            <box flexShrink={0} paddingTop={1}>
+              <box
+                onMouseDown={() => dialog.replace(() => <DialogProjects />)}
+              >
+                <text fg={theme.primary}>+ Proyectos / Agentes</text>
+              </box>
+            </box>
           </box>
         </Show>
+        <box flexGrow={1} alignItems="center" paddingLeft={2} paddingRight={2}>
+          <box flexGrow={1} minHeight={0} />
+          <box height={4} minHeight={0} flexShrink={1} />
+          <box flexShrink={0} flexDirection="row" alignItems="center" gap={2}>
+            <TuiPluginRuntime.Slot name="home_logo" mode="replace" />
+            <box
+              paddingLeft={1}
+              paddingRight={1}
+              onMouseDown={(e: any) => {
+                e?.stopPropagation?.()
+                toggleSidebar()
+              }}
+            >
+              <text fg={theme.textMuted}>☰</text>
+            </box>
+          </box>
+          <box height={1} minHeight={0} flexShrink={1} />
+          <box width="100%" maxWidth={promptMaxWidth()} zIndex={1000} paddingTop={1} flexShrink={0}>
+            <TuiPluginRuntime.Slot name="home_prompt" mode="replace" ref={bind}>
+              <Prompt ref={bind} hideMeta showPlaceholder={false} right={<TuiPluginRuntime.Slot name="home_prompt_right" />} placeholders={placeholder} />
+            </TuiPluginRuntime.Slot>
+          </box>
+          <TuiPluginRuntime.Slot name="home_bottom" />
+          <box flexGrow={1} minHeight={0} />
+          <Toast />
+        </box>
       </box>
       <box width="100%" flexShrink={0}>
         <TuiPluginRuntime.Slot name="home_footer" mode="single_winner" />

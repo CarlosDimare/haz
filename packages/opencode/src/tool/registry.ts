@@ -1,4 +1,6 @@
 import { PlanExitTool } from "./plan"
+import { TramaExitTool } from "./trama"
+import { WalshDeepSearchTool, WalshVerifyTool } from "./walsh"
 import { Session } from "@/session/session"
 import { QuestionTool } from "./question"
 import { ShellTool } from "./shell"
@@ -33,6 +35,7 @@ import * as Log from "@opencode-ai/core/util/log"
 import { LspTool } from "./lsp"
 import * as Truncate from "./truncate"
 import { ApplyPatchTool } from "./apply_patch"
+import { ProjectTool } from "./project"
 import { Glob } from "@opencode-ai/core/util/glob"
 import path from "path"
 import { pathToFileURL } from "url"
@@ -133,6 +136,9 @@ export const layer: Layer.Layer<
     const todo = yield* TodoWriteTool
     const lsptool = yield* LspTool
     const plan = yield* PlanExitTool
+    const trama = yield* TramaExitTool
+    const walshDeepSearch = yield* WalshDeepSearchTool
+    const walshVerify = yield* WalshVerifyTool
     const webfetch = yield* WebFetchTool
     const websearch = yield* WebSearchTool
     const repoClone = yield* RepoCloneTool
@@ -256,9 +262,13 @@ export const layer: Layer.Layer<
           question: Tool.init(question),
           lsp: Tool.init(lsptool),
           plan: Tool.init(plan),
+          trama: Tool.init(trama),
+          "walsh-deep-search": Tool.init(walshDeepSearch),
+          "walsh-verify": Tool.init(walshVerify),
           recordar: Tool.init(recordar),
           olvidar: Tool.init(olvidar),
           "crear-faceta": Tool.init(crearFaceta),
+          project: Tool.init(ProjectTool),
         })
 
         return {
@@ -280,10 +290,13 @@ export const layer: Layer.Layer<
             tool.skill,
             tool.patch,
             ...(flags.experimentalLspTool ? [tool.lsp] : []),
-            ...(flags.experimentalPlanMode && flags.client === "cli" ? [tool.plan] : []),
+            ...(flags.experimentalPlanMode && flags.client === "cli" ? [tool.plan, tool.trama] : []),
             tool.recordar,
             tool.olvidar,
             tool["crear-faceta"],
+            tool["walsh-deep-search"],
+            tool["walsh-verify"],
+            tool.project,
           ],
           task: tool.task,
           read: tool.read,
