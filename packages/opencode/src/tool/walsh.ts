@@ -49,6 +49,28 @@ function callProvider(
   )
 }
 
+function parseResults(result: string): { title?: string; url?: string; content?: string }[] {
+  try {
+    const parsed = JSON.parse(result)
+    if (parsed?.results) return parsed.results
+  } catch {}
+  return []
+}
+
+function formatSources(sources: { title?: string; url?: string; content?: string }[]): string {
+  if (!sources.length) return "  _Sin resultados_"
+  return sources
+    .map((s, i) => {
+      const snippet = (s.content || "").slice(0, 180).replace(/\n/g, " ").trim()
+      const title = s.title || "Sin título"
+      if (!snippet && !s.url) return `${i + 1}. **${title}**`
+      if (!snippet) return `${i + 1}. **${title}** · ${s.url}`
+      if (!s.url) return `${i + 1}. **${title}** — ${snippet}`
+      return `${i + 1}. **${title}** — ${snippet} · ${s.url}`
+    })
+    .join("\n")
+}
+
 export const DeepSearchParameters = Schema.Struct({
   queries: Schema.mutable(Schema.Array(Schema.String)).annotate({
     description: "Array of 3 to 9 search queries from different angles on the same topic",
@@ -87,24 +109,27 @@ export const WalshDeepSearchTool = Tool.define(
             { concurrency: "unbounded" },
           )
 
-          const sources = results.flatMap((r) => {
-            if (!r.result) return []
-            try {
-              const parsed = JSON.parse(r.result)
-              if (parsed?.results) return parsed.results
-            } catch {}
-            return []
+          const allSources = results.flatMap((r) => parseResults(r.result ?? ""))
+          const allSourcesCount = allSources.length
+          const uniqueUrls = new Set(allSources.map((s) => s.url).filter(Boolean)).size
+
+          const queryBlocks = results.map((r) => {
+            const sources = parseResults(r.result ?? "")
+            const sourcesFormatted = formatSources(sources)
+            return [
+              `### "${r.query}"`,
+              sourcesFormatted,
+            ].join("\n")
           })
 
           const output = [
-            `## Resultados de búsqueda profunda (${params.queries.length} queries, ${provider})`,
+            `## 🔍 Búsqueda profunda`,
+            `${params.queries.length} queries · ${allSourcesCount} fuentes · ${uniqueUrls} fuentes únicas · vía ${provider}`,
             "",
-            ...results.map(
-              (r) =>
-                `### Query ${r.index + 1}: "${r.query}"\n${r.result ? r.result.slice(0, 2000) : "Sin resultados"}`,
-            ),
+            ...queryBlocks,
             "",
-            `Fuentes únicas encontradas: ${sources.length}`,
+            `---`,
+            `_walsh deep search · ${params.queries.length} queries · ${allSourcesCount} sources_`,
           ].join("\n")
 
           return {
@@ -157,15 +182,27 @@ export const WalshVerifyTool = Tool.define(
             { concurrency: "unbounded" },
           )
 
+          const allSources = results.flatMap((r) => parseResults(r.result ?? ""))
+          const allSourcesCount = allSources.length
+          const uniqueUrls = new Set(allSources.map((s) => s.url).filter(Boolean)).size
+
+          const queryBlocks = results.map((r) => {
+            const sources = parseResults(r.result ?? "")
+            const sourcesFormatted = formatSources(sources)
+            return [
+              `### "${r.query}"`,
+              sourcesFormatted,
+            ].join("\n")
+          })
+
           const output = [
-            `## Verificación: "${params.claim}"`,
+            `## ✅ Verificación: "${params.claim}"`,
+            `${verifyQueries.length} búsquedas · ${allSourcesCount} fuentes · ${uniqueUrls} fuentes únicas · vía ${provider}`,
             "",
-            ...results.map(
-              (r) => `### Búsqueda ${r.index + 1}: "${r.query}"\n${r.result ? r.result.slice(0, 2000) : "Sin resultados"}`,
-            ),
+            ...queryBlocks,
             "",
-            "---",
-            "**Nota:** Esta es una verificación preliminar. Contrastá con fuentes primarias y verificá fechas de publicación.",
+            `---`,
+            `⚠️ _Verificación preliminar. Contrastá con fuentes primarias y verificá fechas de publicación._`,
           ].join("\n")
 
           return {
