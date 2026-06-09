@@ -5,6 +5,9 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ripgrep \
     git \
+    python3 \
+    make \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . .
