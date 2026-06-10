@@ -1,4 +1,4 @@
-Use this tool when you have completed the planning phase and are ready to exit trama plan agent.
+Use this tool when you have completed the planning phase and are ready to exit piensa plan agent.
 
 This tool will ask the user if they want to switch to haz build agent to start implementing the plan.
 

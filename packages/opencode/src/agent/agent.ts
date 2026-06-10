@@ -15,7 +15,10 @@ import PROMPT_SCOUT from "./prompt/scout.txt"
 import PROMPT_SUMMARY from "./prompt/summary.txt"
 import PROMPT_TITLE from "./prompt/title.txt"
 import PROMPT_WALSH from "./prompt/walsh.txt"
-import PROMPT_MASTRO from "./prompt/mastro.txt"
+import PROMPT_DI from "./prompt/di.txt"
+import PROMPT_MARX from "./prompt/marx.txt"
+import PROMPT_CHE from "./prompt/che.txt"
+import PROMPT_FONTANARROSA from "./prompt/fontanarrosa.txt"
 import { Permission } from "@/permission"
 import { mergeDeep, pipe, sortBy, values } from "remeda"
 import { Global } from "@opencode-ai/core/global"
@@ -131,8 +134,8 @@ export const layer = Layer.effect(
         const user = Permission.fromConfig(cfg.permission ?? {})
 
         const agents: Record<string, Info> = {
-          build: {
-            name: "build",
+          haz: {
+            name: "haz",
             description: "Agente por defecto. Ejecuta herramientas según los permisos configurados.",
             options: {},
             permission: Permission.merge(
@@ -169,16 +172,16 @@ export const layer = Layer.effect(
             mode: "primary",
             native: true,
           },
-          trama: {
-            name: "trama",
-            description: "Modo plan (trama). No permite herramientas de edición.",
+          piensa: {
+            name: "piensa",
+            description: "Modo plan (piensa). No permite herramientas de edición.",
             options: {},
             color: "#6366f1",
             permission: Permission.merge(
               defaults,
               Permission.fromConfig({
                 question: "allow",
-                trama_exit: "allow",
+                piensa_exit: "allow",
                 external_directory: {
                   [path.join(Global.Path.data, "plans", "*")]: "allow",
                 },
@@ -229,8 +232,8 @@ export const layer = Layer.effect(
             mode: "primary",
             native: true,
           },
-          mastro: {
-            name: "mastro",
+          di: {
+            name: "di",
             description: "Asistente conversacional con perspectiva de clase y humor estilo Les Luthiers.",
             color: "#eab308",
             options: {},
@@ -246,7 +249,67 @@ export const layer = Layer.effect(
               }),
               user,
             ),
-            prompt: PROMPT_MASTRO,
+            prompt: PROMPT_DI,
+            mode: "primary",
+            native: true,
+          },
+          marx: {
+            name: "marx",
+            description: "Análisis crítico de la realidad con perspectiva de clase y economía política.",
+            color: "#dc2626",
+            options: {},
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                walsh_deep_search: "allow",
+                walsh_verify: "allow",
+                edit: { "*": "deny" },
+                write: { "*": "deny" },
+                apply_patch: { "*": "deny" },
+                todowrite: "deny",
+              }),
+              user,
+            ),
+            prompt: PROMPT_MARX,
+            mode: "primary",
+            native: true,
+          },
+          che: {
+            name: "che",
+            description: "Acción estratégica y resolución táctica de problemas. Pragmatismo revolucionario.",
+            color: "#16a34a",
+            options: {},
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                plan_enter: "allow",
+              }),
+              user,
+            ),
+            prompt: PROMPT_CHE,
+            mode: "primary",
+            native: true,
+          },
+          fontanarrosa: {
+            name: "fontanarrosa",
+            description: "Conversación con humor, calidez y picardía. El amigo que sabe escuchar y contar.",
+            color: "#f59e0b",
+            options: {},
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                edit: { "*": "deny" },
+                write: { "*": "deny" },
+                apply_patch: { "*": "deny" },
+                shell: { "*": "deny" },
+                todowrite: "deny",
+              }),
+              user,
+            ),
+            prompt: PROMPT_FONTANARROSA,
             mode: "primary",
             native: true,
           },
@@ -402,13 +465,25 @@ export const layer = Layer.effect(
 
         const list = Effect.fnUntraced(function* () {
           const cfg = yield* config.get()
+          const defaultName = cfg.default_agent ?? "haz"
+          const order = [
+            "piensa",
+            defaultName,
+            "di",
+            "marx",
+            "che",
+            "fontanarrosa",
+          ]
           return pipe(
             agents,
             values(),
-            sortBy(
-              [(x) => (cfg.default_agent ? x.name === cfg.default_agent : x.name === "build"), "desc"],
-              [(x) => x.name, "asc"],
-            ),
+            sortBy([
+              (x) => {
+                const idx = order.indexOf(x.name)
+                return idx === -1 ? 999 : idx
+              },
+              "asc",
+            ]),
           )
         })
 

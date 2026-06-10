@@ -63,14 +63,14 @@ export interface ProjectsData {
 
 const AGENT_COLORS = ["#f0a030", "#50c878", "#4a9eff", "#ff6b6b", "#c084fc", "#f472b6"]
 
-export function defaultSubAgent(name: string, index: number): SubAgent {
+export function defaultSubAgent(name: string, index: number, color?: string, tasks?: string): SubAgent {
   return {
     id: generateId(),
     name,
-    tasks: "",
+    tasks: tasks ?? "",
     cron: "",
     enabled: true,
-    color: AGENT_COLORS[index % AGENT_COLORS.length],
+    color: color ?? AGENT_COLORS[index % AGENT_COLORS.length],
     log: [],
   }
 }
@@ -133,9 +133,9 @@ export function updateProject(projects: Project[], id: string, patch: Partial<Pr
   return projects.map((p) => (p.id === id ? { ...p, ...patch, updatedAt: Date.now() } : p))
 }
 
-export function addSubAgent(projects: Project[], projectId: string, name: string, index: number): Project[] {
+export function addSubAgent(projects: Project[], projectId: string, name: string, index: number, color?: string, tasks?: string): Project[] {
   return projects.map((p) =>
-    p.id === projectId ? { ...p, subAgents: [...p.subAgents, defaultSubAgent(name, index)], updatedAt: Date.now() } : p,
+    p.id === projectId ? { ...p, subAgents: [...p.subAgents, defaultSubAgent(name, index, color, tasks)], updatedAt: Date.now() } : p,
   )
 }
 

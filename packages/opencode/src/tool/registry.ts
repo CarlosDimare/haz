@@ -1,5 +1,5 @@
 import { PlanExitTool } from "./plan"
-import { TramaExitTool } from "./trama"
+import { PiensaExitTool } from "./piensa"
 import { WalshDeepSearchTool, WalshVerifyTool } from "./walsh"
 import { Session } from "@/session/session"
 import { QuestionTool } from "./question"
@@ -136,7 +136,7 @@ export const layer: Layer.Layer<
     const todo = yield* TodoWriteTool
     const lsptool = yield* LspTool
     const plan = yield* PlanExitTool
-    const trama = yield* TramaExitTool
+    const piensa = yield* PiensaExitTool
     const walshDeepSearch = yield* WalshDeepSearchTool
     const walshVerify = yield* WalshVerifyTool
     const webfetch = yield* WebFetchTool
@@ -262,7 +262,7 @@ export const layer: Layer.Layer<
           question: Tool.init(question),
           lsp: Tool.init(lsptool),
           plan: Tool.init(plan),
-          trama: Tool.init(trama),
+          piensa: Tool.init(piensa),
           "walsh-deep-search": Tool.init(walshDeepSearch),
           "walsh-verify": Tool.init(walshVerify),
           recordar: Tool.init(recordar),
@@ -290,7 +290,7 @@ export const layer: Layer.Layer<
             tool.skill,
             tool.patch,
             ...(flags.experimentalLspTool ? [tool.lsp] : []),
-            ...(flags.experimentalPlanMode && flags.client === "cli" ? [tool.plan, tool.trama] : []),
+            ...(flags.experimentalPlanMode && flags.client === "cli" ? [tool.plan, tool.piensa] : []),
             tool.recordar,
             tool.olvidar,
             tool["crear-faceta"],

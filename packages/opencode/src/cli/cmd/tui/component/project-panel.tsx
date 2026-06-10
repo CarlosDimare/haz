@@ -33,6 +33,7 @@ import {
   type ProjectFile,
 } from "@tui/util/projects-storage"
 import { circuitEngine } from "@tui/util/circuit-engine"
+import { CHARACTER_CATALOG, type CharacterEntry } from "@tui/util/character-catalog"
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -143,11 +144,36 @@ export function ProjectPanel(props: {
   }
 
   async function handleNewAgent(projId: string, count: number) {
-    const name = await DialogPrompt.show(dialog, "Nuevo subagente", {
-      placeholder: "Nombre del agente",
+    const catalogOptions: DialogSelectOption<CharacterEntry | "custom">[] = CHARACTER_CATALOG.map((c) => ({
+      title: `${c.name} — ${c.title}`,
+      description: c.description,
+      value: c,
+    }))
+    catalogOptions.push({ title: "Personalizado...", description: "Elegir nombre y color manualmente", value: "custom" })
+
+    const selected = await new Promise<CharacterEntry | "custom" | null>((resolve) => {
+      dialog.replace(
+        () => (
+          <DialogSelect<CharacterEntry | "custom">
+            title="Nuevo agente"
+            options={catalogOptions}
+            onSelect={(opt) => { resolve(opt.value); dialog.clear() }}
+          />
+        ),
+        () => resolve(null),
+      )
     })
-    if (!name) return
-    withSave((list) => addSubAgent(list, projId, name, count))
+    if (!selected) return
+
+    if (selected === "custom") {
+      const name = await DialogPrompt.show(dialog, "Nuevo subagente", {
+        placeholder: "Nombre del agente",
+      })
+      if (!name) return
+      withSave((list) => addSubAgent(list, projId, name, count))
+    } else {
+      withSave((list) => addSubAgent(list, projId, selected.name, count, selected.color, selected.suggestedTasks))
+    }
   }
 
   async function handleEditAgentName(projId: string, agent: SubAgent) {

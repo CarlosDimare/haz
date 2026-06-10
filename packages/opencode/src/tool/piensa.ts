@@ -8,12 +8,12 @@ import { MessageV2 } from "../session/message-v2"
 import { Provider } from "@/provider/provider"
 import { InstanceState } from "@/effect/instance-state"
 import { MessageID, PartID } from "../session/schema"
-import EXIT_DESCRIPTION from "./trama-exit.txt"
+import EXIT_DESCRIPTION from "./piensa-exit.txt"
 
 export const Parameters = Schema.Struct({})
 
-export const TramaExitTool = Tool.define(
-  "trama_exit",
+export const PiensaExitTool = Tool.define(
+  "piensa_exit",
   Effect.gen(function* () {
     const session = yield* Session.Service
     const question = yield* Question.Service
@@ -36,7 +36,7 @@ export const TramaExitTool = Tool.define(
                 custom: false,
                 options: [
                   { label: "Yes", description: "Switch to haz agent and start implementing the plan" },
-                  { label: "No", description: "Stay with trama agent to continue refining the plan" },
+                  { label: "No", description: "Stay with piensa agent to continue refining the plan" },
                 ],
               },
             ],

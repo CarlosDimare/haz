@@ -24,7 +24,7 @@ export const apply = Effect.fn("SessionReminders.apply")(function* (input: {
   if (!userMessage) return input.messages
 
   if (!flags.experimentalPlanMode) {
-    if (input.agent.name === "plan" || input.agent.name === "trama") {
+    if (input.agent.name === "plan" || input.agent.name === "piensa") {
       userMessage.parts.push({
         id: PartID.ascending(),
         messageID: userMessage.info.id,
@@ -35,9 +35,9 @@ export const apply = Effect.fn("SessionReminders.apply")(function* (input: {
       })
     }
     const wasPlan = input.messages.some(
-      (msg) => msg.info.role === "assistant" && (msg.info.agent === "plan" || msg.info.agent === "trama"),
+      (msg) => msg.info.role === "assistant" && (msg.info.agent === "plan" || msg.info.agent === "piensa"),
     )
-    if (wasPlan && (input.agent.name === "build" || input.agent.name === "haz")) {
+    if (wasPlan && input.agent.name === "haz") {
       userMessage.parts.push({
         id: PartID.ascending(),
         messageID: userMessage.info.id,
@@ -51,7 +51,7 @@ export const apply = Effect.fn("SessionReminders.apply")(function* (input: {
   }
 
   const assistantMessage = input.messages.findLast((msg) => msg.info.role === "assistant")
-  const isPlanAgent = (name: string | undefined) => name === "plan" || name === "trama"
+  const isPlanAgent = (name: string | undefined) => name === "plan" || name === "piensa"
   if (!isPlanAgent(input.agent.name) && isPlanAgent(assistantMessage?.info.agent)) {
     const ctx = yield* InstanceState.context
     const plan = Session.plan(input.session, ctx)
